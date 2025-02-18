@@ -25,6 +25,34 @@ typedef enum FormatPNM_t {
 
 typedef struct PNM_t PNM;
 
+
+
+/**
+ * Converts a string to the corresponding FormatPNM enum value.
+ *
+ * @param format (FormatPNM*): Pointer to store the resulting enum value.
+ * @param format_string (const char*): String representation of the format.
+ *
+ * @return:
+ *     0 Success
+ *     1 If the string does not match any format
+ */
+int str_to_format(FormatPNM *format, const char *format_string);
+
+/**
+ * Determines the file format based on the filename extension and sets
+ * the corresponding FormatPNM enum value.
+ *
+ * @param format (FormatPNM*): Pointer to store the resulting enum value.
+ * @param filename (const char*): Name of the file to analyze.
+ *
+ * @return:
+ *     0 Success
+ *     1 If file extension does not match any format
+ */
+int file_extension_to_format(FormatPNM *format, const char *filename);
+
+
 FormatPNM get_format(PNM *image);
 
 /**
@@ -44,7 +72,7 @@ FormatPNM get_format(PNM *image);
  *    -1 Erreur à l'allocation de mémoire
  *    -2 Nom du fichier malformé
  *    -3 Contenu du fichier malformé
-*/
+ */
 int load_pnm(PNM **image, const char* filename);
 
 /**
@@ -62,7 +90,7 @@ int load_pnm(PNM **image, const char* filename);
  *     0 Succès
  *    -1 Nom du fichier malformé
  *    -2 Erreur lors de la manipulation du fichier
-*/
+ */
 int write_pnm(PNM *image, const char* filename);
 
 #endif /* pnm.h  */

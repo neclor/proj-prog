@@ -6,8 +6,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+#include <limits.h>
 #include <getopt.h>
 
 #include "pnm.h"
@@ -17,8 +16,8 @@
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
 
 enum {
-   GETOPT_HELP_CHAR = -2,
-   GETOPT_VERSION_CHAR = -3,
+   GETOPT_HELP_CHAR = (CHAR_MIN - 2),
+   GETOPT_VERSION_CHAR = (CHAR_MIN - 3),
 };
 
 static struct option const longopts[] = {
@@ -57,7 +56,9 @@ int main(int argc, char **argv) {
    const char *input_filename = NULL;
    const char *output_filename = NULL;
 
-   FormatPNM format;
+   FormatPNM arg_format;
+   FormatPNM input_file_format;
+   FormatPNM output_file_format;
    PNM *image = NULL;
 
    program_name = argv[0];
@@ -68,25 +69,20 @@ int main(int argc, char **argv) {
          case 'f':
             format_string = optarg;
             break;
-
          case 'i':
             input_filename = optarg;
             break;
-
          case 'o':
             output_filename = optarg;
             break;
-
          case GETOPT_HELP_CHAR:
             usage(EXIT_SUCCESS);
             break;
-
          case GETOPT_VERSION_CHAR:
             fprintf(stdout, "%s %s\n\nWritten by %s.\n",
                PROGRAM_NAME, VERSION, AUTHORS);
             exit(EXIT_SUCCESS);
             break;
-
          default:
             usage(EXIT_FAILURE);
       }
@@ -105,17 +101,29 @@ int main(int argc, char **argv) {
       usage(EXIT_FAILURE);
    }
 
-   if (strcmp(format_string, "PBM") == 0) {
-      format = FORMAT_PBM;
-   } else if (strcmp(format_string, "PGM") == 0) {
-      format = FORMAT_PGM;
-   } else if (strcmp(format_string, "PPM") == 0) {
-      format = FORMAT_PPM;
-   } else {
+   if (str_to_format(&arg_format, format_string) != 0) {
       fprintf(stderr, "%s: unrecognized format '%s' specified with -f\n",
          program_name, format_string);
       usage(EXIT_FAILURE);
    }
+   if (file_extension_to_format(&input_file_format, input_filename) != 0) {
+      fprintf(stderr, "%s: unrecognized file extension '%s'\n",
+         program_name, input_filename);
+      usage(EXIT_FAILURE);
+   }
+   if (file_extension_to_format(&input_file_format, output_filename) != 0) {
+      fprintf(stderr, "%s: unrecognized file extension '%s'\n",
+         program_name, output_filename);
+      usage(EXIT_FAILURE);
+   }
+
+   if (arg_format != input_file_format || input_file_format != input_file_format) {
+      fprintf(stderr, "%s: file and/or argument formats do not match\n",
+         program_name);
+      usage(EXIT_FAILURE);
+   }
+
+
 
    int ok = 1;
    switch (load_pnm(&image, input_filename)) {
@@ -138,11 +146,6 @@ int main(int argc, char **argv) {
    if (ok == 0) {
       perror("");
       return EXIT_FAILURE;
-   }
-
-   if (format != get_format(image)) {
-      fprintf(stderr, "%s: wrong format passed as argument '%s'",
-         program_name, format_string);
    }
 
    switch (write_pnm(image, output_filename))

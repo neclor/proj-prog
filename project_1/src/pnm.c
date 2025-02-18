@@ -4,9 +4,14 @@
  * @projet: INFO0030 Projet 1
 */
 
+#define PBM_MAX_VALUE (1)
+#define PGM_MAX_VALUE (255)
+#define PPM_MAX_VALUE (65535)
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include <strings.h>
 
 #include "pnm.h"
@@ -52,7 +57,7 @@ int create_pnm(
    unsigned int width,
    unsigned int height,
    unsigned int max_value
-   ) {
+) {
    *image = malloc(sizeof(PNM));
    PNM *image_pnm = *image;
    if (image_pnm == NULL) return 1;
@@ -102,11 +107,11 @@ void skip_comments(FILE *file) {
 }
 
 int magic_string_to_format(FormatPNM *format, const char *magic_string) {
-   if (strcmp(magic_string, "P1")) {
+   if (strcmp(magic_string, "P1") == 0) {
       *format = FORMAT_PBM;
-   } else if (strcmp(magic_string, "P2")) {
+   } else if (strcmp(magic_string, "P2") == 0) {
       *format = FORMAT_PGM;
-   } else if (strcmp(magic_string, "P3")) {
+   } else if (strcmp(magic_string, "P3") == 0) {
       *format = FORMAT_PPM;
    } else {
       return 1;
@@ -120,7 +125,7 @@ int read_header(
    unsigned int *height,
    unsigned int *max_value,
    FILE *file
-   ) {
+) {
    skip_comments(file);
 
    char magic_string[3];
@@ -137,18 +142,25 @@ int read_header(
 
    skip_comments(file);
 
-   if (*format == FORMAT_PBM) {
-      *max_value = 1;
-   } else {
-      if (fscanf(file, "%u", max_value) != 1) return 1;
+   switch (*format)
+   {
+      case FORMAT_PBM:
+         *max_value = PBM_MAX_VALUE;
+         break;
+      case FORMAT_PGM:
+         if (fscanf(file, "%u", max_value) != 1) return 1;
+         if (PGM_MAX_VALUE < *max_value) return 1;
+         break;
+      case FORMAT_PPM:
+         if (fscanf(file, "%u", max_value) != 1) return 1;
+         if (PPM_MAX_VALUE <= *max_value) return 1;
+         break;
    }
    return 0;
 }
 
 int read_data(PNM *image, FILE *file) {
    FormatPNM format = image->format;
-   unsigned int width = image->width;
-   unsigned int height = image->height;
    unsigned int max_value = image->max_value;
    size_t data_count = image->data_count;
    DataPNM data = image->data;
@@ -174,7 +186,7 @@ int read_data(PNM *image, FILE *file) {
 
 int load_pnm(PNM **image, const char *filename) {
    FormatPNM file_extension;
-   if (read_file_extension(&file_extension, filename) != 0) {
+   if (file_extension_to_format(&file_extension, filename) != 0) {
       return PNM_LOAD_INVALID_FILENAME;
    }
 
@@ -187,55 +199,101 @@ int load_pnm(PNM **image, const char *filename) {
    unsigned int max_value;
 
    if (read_header(&format, &width, &height, &max_value, file) != 0) {
-      fclose(file);
+      if (fclose(file) != 0) return PNM_LOAD_INVALID_FILENAME;
       return PNM_LOAD_DECODE_ERROR;
    }
 
    if (format != file_extension) {
-      fclose(file);
+      if (fclose(file) != 0) return PNM_LOAD_INVALID_FILENAME;
       return PNM_LOAD_DECODE_ERROR;
    }
 
    if (create_pnm(image, format, width, height, max_value) != 0) {
-      fclose(file);
+      if (fclose(file) != 0) return PNM_LOAD_INVALID_FILENAME;
       return PNM_LOAD_MEMORY_ERROR;
    }
 
    if (read_data(*image, file) != 0) {
       free_pnm(image);
-      fclose(file);
+      if (fclose(file) != 0) return PNM_LOAD_INVALID_FILENAME;
       return PNM_LOAD_DECODE_ERROR;
    }
 
-   fclose(file);
+   if (fclose(file) != 0) return PNM_LOAD_INVALID_FILENAME;
    return PNM_LOAD_SUCCESS;
 }
 
-int write_pnm(PNM *image, const char *filename) {
-   /* Insérez le code ici */
+char *format_to_magic_string(FormatPNM format) {
+   switch (format) {
+      case FORMAT_PBM:
+         return "P1";
+      case FORMAT_PGM:
+         return "P2";
+      case FORMAT_PPM:
+         return "P3";
+   }
+}
 
+int write_header(
+   FormatPNM format,
+   unsigned int width,
+   unsigned int height,
+   unsigned int max_value,
+   FILE *file
+) {
+   if (fprintf(file, "%s\n", format_to_magic_string(format)) < 0) return 1;
+   if (fprintf(file, "%u %u\n", width, height) < 0) return 1;
+   if (format != FORMAT_PBM) {
+      if (fprintf(file, "%u\n", max_value) < 0) return 1;
+   }
    return 0;
 }
 
+int write_data(
+   FormatPNM format,
+   unsigned int width,
+   unsigned int height,
+   DataPNM data,
+   FILE *file
+) {
+   for (unsigned int y = 0; y < height; y++) {
+      for (unsigned int x = 0; x < width; x++) {
+         size_t i = y * width + x;
+         if (format == FORMAT_PPM) {
+            i *= 3;
+            if (
+               fprintf(file, "%u %u %u ",
+                  data.ui[i], data.ui[i + 1],  data.ui[i + 2]) < 0
+            ) return 1;
+         } else {
+            if (fprintf(file, "%u ", data.uc[i]) < 0) return 1;
+         }
+      }
+      if (fprintf(file, "\n") < 0) return 1;
+   }
+   return 0;
+}
 
+int write_pnm(PNM *image, const char *filename) {
+   FILE *file = fopen(filename, "w");
+   if (file == NULL) return PNM_WRITE_INVALID_FILENAME;
 
+   FormatPNM format = image->format;
+   unsigned int width = image->width;
+   unsigned int height = image->height;
+   unsigned int max_value = image->max_value;
+   DataPNM data = image->data;
 
+   if (write_header(format, width, height, max_value, file) != 0) {
+      if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
+      return PNM_WRITE_FILE_MANIPULATION_ERROR;
+   }
 
-/*
+   if (write_data(format, width, height, data, file) != 0) {
+      if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
+      return PNM_WRITE_FILE_MANIPULATION_ERROR;
+   }
 
-fscanf(FILE *stream, format, …)	Читает форматированные данные из файла.
-
-fgets(char *str, int size, FILE *stream)	Читает строку, включая пробелы и \n.
-
-fgetc(FILE *stream)	Читает один символ.
-
-getc(FILE *stream)	Аналогично fgetc().
-
-ungetc(int ch, FILE *stream)	"Возвращает" символ в поток.
-
-fread(void *ptr, size_t size, size_t count, FILE *stream)
-
-
-
-
-*/
+   if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
+   return 0;
+}

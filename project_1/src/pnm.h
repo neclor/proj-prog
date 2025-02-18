@@ -20,12 +20,9 @@ typedef enum FormatPNM_t {
     FORMAT_PBM,
     FORMAT_PGM,
     FORMAT_PPM,
-    FORMAT_UNKNOWN
 } FormatPNM;
 
 typedef struct PNM_t PNM;
-
-
 
 /**
  * Converts a string to the corresponding FormatPNM enum value.
@@ -52,12 +49,15 @@ int str_to_format(FormatPNM *format, const char *format_string);
  */
 int file_extension_to_format(FormatPNM *format, const char *filename);
 
-
-FormatPNM get_format(PNM *image);
+/**
+ *
+ *
+ *
+ * @param image (PNM**):
+ */
+void free_pnm(PNM **image);
 
 /**
- * load_pnm
- *
  * Charge une image PNM depuis un fichier.
  *
  * @param image l'adresse d'un pointeur sur PNM à laquelle écrire l'adresse
@@ -76,8 +76,6 @@ FormatPNM get_format(PNM *image);
 int load_pnm(PNM **image, const char* filename);
 
 /**
- * write_pnm
- *
  * Sauvegarde une image PNM dans un fichier.
  *
  * @param image un pointeur sur PNM.

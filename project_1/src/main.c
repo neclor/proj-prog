@@ -42,8 +42,8 @@ Manipulates PNM format files.\n\
 \n\
 Mandatory arguments to long options are mandatory for short options too.\n\
   -f, --format=FORMAT          specify format FORMAT={PBM,PGM,PPM}\n\
-  -i, --input=FILE             specify input file\n\
-  -o, --output=FILE            specify output file\n\
+  -i, --input=FILE             specify input file {.ppm,.pbm,.pgm}\n\
+  -o, --output=FILE            specify output file {.ppm,.pbm,.pgm}\n\
       --help        display this help and exit\n\
       --version     output version information and exit\n\
 ", stdout);
@@ -120,51 +120,45 @@ int main(int argc, char **argv) {
    if (arg_format != input_file_format || input_file_format != input_file_format) {
       fprintf(stderr, "%s: file and/or argument formats do not match\n",
          program_name);
-      usage(EXIT_FAILURE);
+      exit(EXIT_FAILURE);
    }
 
-
-
-   int ok = 1;
    switch (load_pnm(&image, input_filename)) {
       case PNM_LOAD_MEMORY_ERROR:
-         ok = 0;
          fprintf(stderr, "%s: ", program_name);
+         perror("");
+         return EXIT_FAILURE;
          break;
       case PNM_LOAD_INVALID_FILENAME:
-         ok = 0;
          fprintf(stderr, "%s: invalid filename '%s': ",
             program_name, input_filename);
+         perror("");
+         return EXIT_FAILURE;
          break;
       case PNM_LOAD_DECODE_ERROR:
-         ok = 0;
-         fprintf(stderr, "%s: '%s': decode error",
+         fprintf(stderr, "%s: '%s': decode error\n",
             program_name, input_filename);
+         return EXIT_FAILURE;
          break;
    }
 
-   if (ok == 0) {
-      perror("");
-      return EXIT_FAILURE;
-   }
-
-   switch (write_pnm(image, output_filename))
-   {
+   int ok = 1;
+   switch (write_pnm(image, output_filename)) {
       case PNM_WRITE_INVALID_FILENAME:
          ok = 0;
          fprintf(stderr, "%s: invalid filename '%s': ",
             program_name, input_filename);
+         perror("");
          break;
       case PNM_WRITE_FILE_MANIPULATION_ERROR:
          ok = 0;
          fprintf(stderr, "%s: '%s': file manipulation error: ",
             program_name, input_filename);
+         perror("");
          break;
    }
 
-   if (ok == 0) {
-      perror("");
-   }
+   free_pnm(&image);
 
    return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

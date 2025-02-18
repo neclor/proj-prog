@@ -147,13 +147,13 @@ int main(int argc, char **argv) {
       case PNM_WRITE_INVALID_FILENAME:
          ok = 0;
          fprintf(stderr, "%s: invalid filename '%s': ",
-            program_name, input_filename);
+            program_name, output_filename);
          perror("");
          break;
       case PNM_WRITE_FILE_MANIPULATION_ERROR:
          ok = 0;
          fprintf(stderr, "%s: '%s': file manipulation error: ",
-            program_name, input_filename);
+            program_name, output_filename);
          perror("");
          break;
    }

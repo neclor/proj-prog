@@ -50,9 +50,6 @@ int str_to_format(FormatPNM *format, const char *format_string);
 int file_extension_to_format(FormatPNM *format, const char *filename);
 
 /**
- *
- *
- *
  * @param image (PNM**):
  */
 void free_pnm(PNM **image);

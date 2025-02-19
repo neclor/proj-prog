@@ -153,7 +153,7 @@ int read_header(
          break;
       case FORMAT_PPM:
          if (fscanf(file, "%u", max_value) != 1) return 1;
-         if (PPM_MAX_VALUE <= *max_value) return 1;
+         if (PPM_MAX_VALUE < *max_value) return 1;
          break;
    }
    return 0;

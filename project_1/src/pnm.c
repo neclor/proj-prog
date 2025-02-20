@@ -119,6 +119,14 @@ int magic_string_to_format(FormatPNM *format, const char *magic_string) {
    return 0;
 }
 
+int fscanf_unsigned(FILE *file, unsigned int *value) {
+   long long_value;
+   if (fscanf(file, "%ld", &long_value) != 1) return 1;
+   if (long_value < 0) return 1;
+   *value = (unsigned int)long_value;
+   return 0;
+}
+
 int read_header(
    FormatPNM *format,
    unsigned int *width,
@@ -134,11 +142,11 @@ int read_header(
 
    skip_comments(file);
 
-   if (fscanf(file, "%u", width) != 1) return 1;
+   if (fscanf_unsigned(file, width) != 0) return 1;
 
    skip_comments(file);
 
-   if (fscanf(file, "%u", height) != 1) return 1;
+   if (fscanf_unsigned(file, height) != 0) return 1;
 
    skip_comments(file);
 
@@ -148,11 +156,11 @@ int read_header(
          *max_value = PBM_MAX_VALUE;
          break;
       case FORMAT_PGM:
-         if (fscanf(file, "%u", max_value) != 1) return 1;
+         if (fscanf_unsigned(file, max_value) != 0) return 1;
          if (PGM_MAX_VALUE < *max_value) return 1;
          break;
       case FORMAT_PPM:
-         if (fscanf(file, "%u", max_value) != 1) return 1;
+         if (fscanf_unsigned(file, max_value) != 0) return 1;
          if (PPM_MAX_VALUE < *max_value) return 1;
          break;
    }
@@ -169,10 +177,8 @@ int read_data(PNM *image, FILE *file) {
       skip_comments(file);
 
       unsigned int value;
-      if (fscanf(file, "%u", &value) != 1) return 1;
-      if (max_value < value) {
-         value = max_value;
-      }
+      if (fscanf_unsigned(file, &value) != 0) return 1;
+      if (max_value < value) return 1;
 
       if (format == FORMAT_PPM) {
          data.ui[i] = value;

@@ -10,10 +10,13 @@ P1 # PBM
 ### DATA ###
 
 1 # Max value
-2 # > Max value
 
-    0
-0 0 0
-0 0 0
+   1  0
+0  0  0
+0  0  0
+
+# Extra data
+
+1 1 1
 
 # End

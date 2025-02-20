@@ -13,10 +13,15 @@ P2 # PGM
 ### DATA ###
 
 255 # Max value
-256 # > Max value
 
-    0
-0 0 0
-0 0 0
+      0  1
+10  100  0
+ 0    0  0
+
+# End
+
+# Extra data
+
+1 1 1
 
 # End

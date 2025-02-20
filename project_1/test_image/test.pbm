@@ -1,0 +1,19 @@
+# Format
+P1 # PBM
+
+# Width
+3
+
+# Height
+3
+
+### DATA ###
+
+1 # Max value
+2 # > Max value
+
+    0
+0 0 0
+0 0 0
+
+# End

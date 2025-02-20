@@ -1,0 +1,23 @@
+# Format
+P3 # PPM
+
+# Width
+3
+
+# Height
+3
+
+# Max value
+65535
+
+### DATA ###
+
+0
+65535 # Max value
+65536 # > Max value
+
+      1 1 1 0 0 0
+0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0
+
+# End

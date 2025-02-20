@@ -29,6 +29,11 @@ $(OBJ_DIR)/pnm.o: $(SRC_DIR)/pnm.c $(SRC_DIR)/pnm.h
 clean:
 	rm -f $(OBJ_DIR)/*.o $(TARGET)
 
+test: $(TARGET)
+	./$(TARGET) -f pbm -i test_image/test.pbm -o test_image/result.pbm
+	./$(TARGET) -f pgm -i test_image/test.pgm -o test_image/result.pgm
+	./$(TARGET) -f ppm -i test_image/test.ppm -o test_image/result.ppm
+
 git:
 	git pull
 	git add .

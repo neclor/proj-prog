@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <strings.h>
+#include <limits.h>
 
 #include "pnm.h"
 
@@ -123,7 +124,8 @@ int fscanf_unsigned(FILE *file, unsigned int *value) {
    long long_value;
    if (fscanf(file, "%ld", &long_value) != 1) return 1;
    if (long_value < 0) return 1;
-   *value = (unsigned int)long_value;
+   if (long_value > UINT_MAX) return 1;
+   *value = long_value;
    return 0;
 }
 

@@ -4,25 +4,29 @@
  * @projet: INFO0030 Projet 1
 */
 
+
 #ifndef _PNM_H
 #define _PNM_H 1
 
-#define PNM_LOAD_SUCCESS (0)
-#define PNM_LOAD_MEMORY_ERROR (-1)
-#define PNM_LOAD_INVALID_FILENAME (-2)
-#define PNM_LOAD_DECODE_ERROR (-3)
 
-#define PNM_WRITE_SUCCESS (0)
-#define PNM_WRITE_INVALID_FILENAME (-1)
-#define PNM_WRITE_FILE_MANIPULATION_ERROR (-2)
+#define PNM_LOAD_SUCCESS 0
+#define PNM_LOAD_MEMORY_ERROR -1
+#define PNM_LOAD_INVALID_FILENAME -2
+#define PNM_LOAD_DECODE_ERROR -3
+
+#define PNM_WRITE_SUCCESS 0
+#define PNM_WRITE_INVALID_FILENAME -1
+#define PNM_WRITE_FILE_MANIPULATION_ERROR -2
+
 
 typedef enum FormatPNM_t {
     FORMAT_PBM,
     FORMAT_PGM,
-    FORMAT_PPM,
+    FORMAT_PPM
 } FormatPNM;
 
 typedef struct PNM_t PNM;
+
 
 /**
  * Converts a string to the corresponding FormatPNM enum value.
@@ -34,7 +38,7 @@ typedef struct PNM_t PNM;
  *     0 Success
  *     1 If the string does not match any format
  */
-int str_to_format(FormatPNM *format, const char *format_string);
+int str_to_format(const char *format_string, FormatPNM *format);
 
 /**
  * Determines the file format based on the filename extension and sets
@@ -47,7 +51,7 @@ int str_to_format(FormatPNM *format, const char *format_string);
  *     0 Success
  *     1 If file extension does not match any format
  */
-int file_extension_to_format(FormatPNM *format, const char *filename);
+int file_extension_to_format(const char *filename, FormatPNM *format);
 
 /**
  * @param image (PNM**):
@@ -88,4 +92,4 @@ int load_pnm(PNM **image, const char* filename);
  */
 int write_pnm(PNM *image, const char* filename);
 
-#endif /* pnm.h  */
+#endif // pnm.h

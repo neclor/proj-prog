@@ -4,16 +4,19 @@
  * @projet: INFO0030 Projet 1
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
+
 #include <getopt.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "pnm.h"
+
 
 #define PROGRAM_NAME "./pnm"
 #define VERSION "1.0"
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
+
 
 enum {
    GETOPT_HELP_CHAR = (CHAR_MIN - 2),
@@ -30,6 +33,16 @@ static struct option const longopts[] = {
 };
 
 const char *program_name;
+
+
+// ======= Prototypes =======
+
+
+void usage(int status);
+
+
+// ======= Code =======
+
 
 void usage(int status) {
    if (status != EXIT_SUCCESS) {
@@ -69,20 +82,25 @@ int main(int argc, char **argv) {
          case 'f':
             format_string = optarg;
             break;
+
          case 'i':
             input_filename = optarg;
             break;
+
          case 'o':
             output_filename = optarg;
             break;
+
          case GETOPT_HELP_CHAR:
             usage(EXIT_SUCCESS);
             break;
+
          case GETOPT_VERSION_CHAR:
             fprintf(stdout, "%s %s\n\nWritten by %s.\n",
                PROGRAM_NAME, VERSION, AUTHORS);
             exit(EXIT_SUCCESS);
             break;
+
          default:
             usage(EXIT_FAILURE);
       }
@@ -101,23 +119,23 @@ int main(int argc, char **argv) {
       usage(EXIT_FAILURE);
    }
 
-   if (str_to_format(&arg_format, format_string) != 0) {
+   if (str_to_format(format_string, &arg_format) != 0) {
       fprintf(stderr, "%s: unrecognized format '%s' specified with -f\n",
          program_name, format_string);
       usage(EXIT_FAILURE);
    }
-   if (file_extension_to_format(&input_file_format, input_filename) != 0) {
+   if (file_extension_to_format(input_filename, &input_file_format) != 0) {
       fprintf(stderr, "%s: unrecognized file extension '%s'\n",
          program_name, input_filename);
       usage(EXIT_FAILURE);
    }
-   if (file_extension_to_format(&input_file_format, output_filename) != 0) {
+   if (file_extension_to_format(output_filename, &output_file_format) != 0) {
       fprintf(stderr, "%s: unrecognized file extension '%s'\n",
          program_name, output_filename);
       usage(EXIT_FAILURE);
    }
 
-   if (arg_format != input_file_format || input_file_format != input_file_format) {
+   if (arg_format != input_file_format || input_file_format != output_file_format) {
       fprintf(stderr, "%s: file and/or argument formats do not match\n",
          program_name);
       exit(EXIT_FAILURE);
@@ -128,18 +146,15 @@ int main(int argc, char **argv) {
          fprintf(stderr, "%s: ", program_name);
          perror("");
          return EXIT_FAILURE;
-         break;
       case PNM_LOAD_INVALID_FILENAME:
          fprintf(stderr, "%s: invalid filename '%s': ",
             program_name, input_filename);
          perror("");
          return EXIT_FAILURE;
-         break;
       case PNM_LOAD_DECODE_ERROR:
          fprintf(stderr, "%s: '%s': decode error\n",
             program_name, input_filename);
          return EXIT_FAILURE;
-         break;
    }
 
    int ok = 1;

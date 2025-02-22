@@ -37,5 +37,5 @@ test: $(TARGET)
 git:
 	git pull
 	git add .
-	git commit -m "Makefile push `date +'%Y-%m-%d %H:%M:%S'`"
+	git commit -m "Makefile push"
 	git push

@@ -158,6 +158,7 @@ int main(int argc, char **argv) {
             program_name, input_filename);
          return EXIT_FAILURE;
       default:
+         perror("");
          return EXIT_FAILURE;      
    }
 

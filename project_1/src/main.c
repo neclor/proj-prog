@@ -82,25 +82,20 @@ int main(int argc, char **argv) {
          case 'f':
             format_string = optarg;
             break;
-
          case 'i':
             input_filename = optarg;
             break;
-
          case 'o':
             output_filename = optarg;
             break;
-
          case GETOPT_HELP_CHAR:
             usage(EXIT_SUCCESS);
             break;
-
          case GETOPT_VERSION_CHAR:
             fprintf(stdout, "%s %s\n\nWritten by %s.\n",
                PROGRAM_NAME, VERSION, AUTHORS);
             exit(EXIT_SUCCESS);
             break;
-
          default:
             usage(EXIT_FAILURE);
       }
@@ -142,7 +137,7 @@ int main(int argc, char **argv) {
    }
 
    switch (load_pnm(&image, input_filename)) {
-      case 0:
+      case PNM_LOAD_SUCCESS:
          break;
       case PNM_LOAD_MEMORY_ERROR:
          fprintf(stderr, "%s: ", program_name);
@@ -164,6 +159,8 @@ int main(int argc, char **argv) {
 
    int ok = 1;
    switch (write_pnm(image, output_filename)) {
+      case PNM_WRITE_SUCCESS:
+         break;
       case PNM_WRITE_INVALID_FILENAME:
          ok = 0;
          fprintf(stderr, "%s: invalid filename '%s': ",
@@ -176,6 +173,9 @@ int main(int argc, char **argv) {
             program_name, output_filename);
          perror("");
          break;
+      default:
+         ok = 0;
+         perror("");
    }
 
    free_pnm(&image);

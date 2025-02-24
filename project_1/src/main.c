@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
          return EXIT_FAILURE;
       default:
          perror("");
-         return EXIT_FAILURE;      
+         return EXIT_FAILURE;
    }
 
    int ok = 1;

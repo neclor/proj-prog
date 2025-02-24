@@ -142,6 +142,8 @@ int main(int argc, char **argv) {
    }
 
    switch (load_pnm(&image, input_filename)) {
+      case 0:
+         break;
       case PNM_LOAD_MEMORY_ERROR:
          fprintf(stderr, "%s: ", program_name);
          perror("");
@@ -155,6 +157,9 @@ int main(int argc, char **argv) {
          fprintf(stderr, "%s: '%s': decode error\n",
             program_name, input_filename);
          return EXIT_FAILURE;
+      default:
+         perror("");
+         return EXIT_FAILURE;      
    }
 
    int ok = 1;

@@ -14,7 +14,7 @@
 
 
 #define PROGRAM_NAME "./pnm"
-#define VERSION "1.0"
+#define VERSION "1.1.0"
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
 
 
@@ -29,7 +29,7 @@ static struct option const longopts[] = {
    {"output", required_argument, NULL, 'o'},
    {"help", no_argument, NULL, GETOPT_HELP_CHAR},
    {"version", no_argument, NULL, GETOPT_VERSION_CHAR},
-   {NULL, no_argument, NULL, 0}
+   {NULL, no_argument, NULL, 0},
 };
 
 const char *program_name;

@@ -1,6 +1,6 @@
 /**
  * @author: Pavlov Aleksandr s2400691
- * @date: 24.02.2025
+ * @date: 05.03.2025
  * @projet: INFO0030 Projet 1
 */
 
@@ -34,6 +34,8 @@ typedef struct PNM_t PNM;
  * @param format (FormatPNM*): Pointer to store the resulting enum value.
  * @param format_string (const char*): String representation of the format.
  *
+ * @pre: format != NULL
+ *
  * @return:
  *     0 Success
  *     1 If the string does not match any format
@@ -47,6 +49,8 @@ int str_to_format(const char *format_string, FormatPNM *format);
  * @param format (FormatPNM*): Pointer to store the resulting enum value.
  * @param filename (const char*): Name of the file to analyze.
  *
+ * @pre: format != NULL
+ *
  * @return:
  *     0 Success
  *     1 If file extension does not match any format
@@ -54,41 +58,45 @@ int str_to_format(const char *format_string, FormatPNM *format);
 int file_extension_to_format(const char *filename, FormatPNM *format);
 
 /**
- * @param image (PNM**):
+ * Frees the memory allocated for a PNM image.
+ *
+ * @param image (PNM**): A double pointer to a PNM image that will be
+ *                       deallocated. The pointer is set to NULL after
+ *                       deallocation.
  */
 void free_pnm(PNM **image);
 
 /**
- * Charge une image PNM depuis un fichier.
+ * Loads a PNM image from a file.
  *
- * @param image l'adresse d'un pointeur sur PNM à laquelle écrire l'adresse
- *              de l'image chargée.
- * @param filename le chemin vers le fichier contenant l'image.
+ * @param image (PNM**): the address of a pointer on PNM to write the address
+ *                       of the loaded image to.
+ * @param filename (const char*): the path to the file containing the image.
  *
  * @pre: image != NULL, filename != NULL
- * @post: image pointe vers l'image chargée depuis le fichier.
+ * @post: image points to the image loaded from the file.
  *
  * @return:
- *     0 Succès
- *    -1 Erreur à l'allocation de mémoire
- *    -2 Nom du fichier malformé
- *    -3 Contenu du fichier malformé
+ *     0 Success
+ *    -1 Memory allocation error
+ *    -2 Malformed file name
+ *    -3 Malformed file content
  */
 int load_pnm(PNM **image, const char* filename);
 
 /**
- * Sauvegarde une image PNM dans un fichier.
+ * Saves a PNM image to a file.
  *
- * @param image un pointeur sur PNM.
- * @param filename le chemin vers le fichier de destination.
+ * @param image (PNM*): a pointer to PNM.
+ * @param filename (const char*): the path to the destination file.
  *
  * @pre: image != NULL, filename != NULL
- * @post: le fichier filename contient l'image PNM image.
+ * @post: the file filename contains the PNM image.
  *
  * @return:
- *     0 Succès
- *    -1 Nom du fichier malformé
- *    -2 Erreur lors de la manipulation du fichier
+ *     0 Success
+ *    -1 Malformed file name
+ *    -2 Error while manipulating the file
  */
 int write_pnm(PNM *image, const char* filename);
 

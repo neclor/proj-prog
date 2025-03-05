@@ -14,11 +14,11 @@
 
 
 #define PROGRAM_NAME "./pnm"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
 
 
-enum {
+static enum {
    GETOPT_HELP_CHAR = (CHAR_MIN - 2),
    GETOPT_VERSION_CHAR = (CHAR_MIN - 3),
 };
@@ -38,13 +38,13 @@ const char *program_name;
 // ======= Prototypes =======
 
 
-void usage(int status);
+static void usage(int status);
 
 
 // ======= Code =======
 
 
-void usage(int status) {
+static void usage(int status) {
    if (status != EXIT_SUCCESS) {
       fprintf(stderr, "Try '%s --help' for more information.\n",
          program_name);

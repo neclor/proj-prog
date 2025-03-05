@@ -42,7 +42,7 @@ static int create_pnm(
    uint16_t max_value
 );
 
-int read_header(
+static int read_header(
    FILE *file,
    FormatPNM *format,
    unsigned int *width,
@@ -50,17 +50,18 @@ int read_header(
    uint16_t *max_value
 );
 
-int magic_string_to_format(const char *magic_string, FormatPNM *format);
-void skip_comments(FILE *file);
-int read_uint16(FILE *file, uint16_t *value);
-int read_unsigned_int(FILE *file, unsigned int *value);
-int fscanf_unsigned_int(FILE *file, unsigned int *value);
+static int magic_string_to_format(const char *magic_string, FormatPNM *format);
+static void skip_comments(FILE *file);
+static int read_uint16(FILE *file, uint16_t *value);
+static int read_unsigned_int(FILE *file, unsigned int *value);
+static int fscanf_unsigned_int(FILE *file, unsigned int *value);
 
-int read_data(FILE *file, PNM *image);
+static int read_data(FILE *file, PNM *image);
 
-int write_header(FILE *file, PNM *image);
-const char *format_to_magic_string(FormatPNM format);
-int write_data(FILE *file, PNM *image);
+static int check_invalid_characters(const char *filename);
+static int write_header(FILE *file, PNM *image);
+static const char *format_to_magic_string(FormatPNM format);
+static int write_data(FILE *file, PNM *image);
 
 
 // ======= Code =======
@@ -93,7 +94,7 @@ void free_pnm(PNM **image) {
    *image = NULL;
 }
 
-int create_pnm(
+static int create_pnm(
    PNM **image,
    FormatPNM format,
    unsigned int width,
@@ -165,7 +166,7 @@ int load_pnm(PNM **image, const char *filename) {
    return PNM_LOAD_SUCCESS;
 }
 
-int read_header(
+static int read_header(
    FILE *file,
    FormatPNM *format,
    unsigned int *width,
@@ -197,7 +198,7 @@ int read_header(
    return 0;
 }
 
-int magic_string_to_format(const char *magic_string, FormatPNM *format) {
+static int magic_string_to_format(const char *magic_string, FormatPNM *format) {
    if (strcmp(magic_string, "P1") == 0) {
       *format = FORMAT_PBM;
    } else if (strcmp(magic_string, "P2") == 0) {
@@ -210,7 +211,7 @@ int magic_string_to_format(const char *magic_string, FormatPNM *format) {
    return 0;
 }
 
-void skip_comments(FILE *file) {
+static void skip_comments(FILE *file) {
    char c;
    while ((c = fgetc(file)) != EOF) {
       if isspace(c) continue;
@@ -224,7 +225,7 @@ void skip_comments(FILE *file) {
    }
 }
 
-int read_uint16(FILE *file, uint16_t *value) {
+static int read_uint16(FILE *file, uint16_t *value) {
    unsigned int u_value;
    if (read_unsigned_int(file, &u_value) != 0) return 1;
    if (UINT16_MAX < u_value) return 1;
@@ -232,13 +233,13 @@ int read_uint16(FILE *file, uint16_t *value) {
    return 0;
 }
 
-int read_unsigned_int(FILE *file, unsigned int *value) {
+static int read_unsigned_int(FILE *file, unsigned int *value) {
    skip_comments(file);
    if (fscanf_unsigned_int(file, value) != 0) return 1;
    return 0;
 }
 
-int fscanf_unsigned_int(FILE *file, unsigned int *value) {
+static int fscanf_unsigned_int(FILE *file, unsigned int *value) {
    long long_value;
    if (fscanf(file, "%ld", &long_value) != 1) return 1;
    if (UINT_MAX < long_value || long_value < 0) return 1;
@@ -246,7 +247,7 @@ int fscanf_unsigned_int(FILE *file, unsigned int *value) {
    return 0;
 }
 
-int read_data(FILE *file, PNM *image) {
+static int read_data(FILE *file, PNM *image) {
    uint16_t max_value = image->max_value;
    size_t data_count = image->data_count;
    uint16_t *data = image->data;
@@ -260,6 +261,10 @@ int read_data(FILE *file, PNM *image) {
 }
 
 int write_pnm(PNM *image, const char *filename) {
+   if (check_invalid_characters(filename) != 0) {
+      return PNM_WRITE_INVALID_FILENAME;
+   }
+
    FILE *file = fopen(filename, "w");
    if (file == NULL) return PNM_WRITE_INVALID_FILENAME;
 
@@ -277,7 +282,16 @@ int write_pnm(PNM *image, const char *filename) {
    return 0;
 }
 
-int write_header(FILE *file, PNM *image) {
+static int check_invalid_characters(const char *filename) {
+   const char *invalid_characters = "\\/:*?\"<>|";
+   while (*invalid_characters != '\0') {
+      if (strchr(filename, *invalid_characters) != NULL) return 1;
+      invalid_characters++;
+   }
+   return 0;
+}
+
+static int write_header(FILE *file, PNM *image) {
    FormatPNM format = image->format;
    unsigned int width = image->width;
    unsigned int height = image->height;
@@ -291,7 +305,7 @@ int write_header(FILE *file, PNM *image) {
    return 0;
 }
 
-const char *format_to_magic_string(FormatPNM format) {
+static const char *format_to_magic_string(FormatPNM format) {
    switch (format) {
       case FORMAT_PBM:
          return "P1";
@@ -304,7 +318,7 @@ const char *format_to_magic_string(FormatPNM format) {
    }
 }
 
-int write_data(FILE *file, PNM *image) {
+static int write_data(FILE *file, PNM *image) {
    FormatPNM format = image->format;
    unsigned int width = image->width;
    unsigned int height = image->height;

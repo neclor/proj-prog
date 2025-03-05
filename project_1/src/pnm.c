@@ -283,11 +283,8 @@ int write_pnm(PNM *image, const char *filename) {
 }
 
 static int check_invalid_characters(const char *filename) {
-   const char *invalid_characters = "\\/:*?\"<>|";
-   while (*invalid_characters != '\0') {
-      if (strchr(filename, *invalid_characters) != NULL) return 1;
-      invalid_characters++;
-   }
+   const char *invalid_characters = "\\:*?\"<>|";
+   if (strpbrk(filename, invalid_characters) != NULL) return 1;
    return 0;
 }
 

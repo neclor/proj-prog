@@ -62,43 +62,15 @@
 
 
 %%%%%%%%%%%%%%%% MILESTONE %%%%%%%%%%%%%%%
-\newcommand{\prefixe}{\operatorname{prefixe}}
-\newcommand{\suffixe}{\operatorname{suffixe}}
-
 \section{Production}
 %%%%%%%%%%%%%%%%%%%%%
 
-
-\textbf{Définition du préfixe et du suffixe:}
-\begin{itemize}
-    \item Préfixe:
-    \[
-        \prefixe(T, k) \equiv \{T_0, T_1, \dots, T_{k-1}\}
-    \]
-    \item Suffixe:
-    \[
-        \suffixe(T, k) \equiv \{T_{N-k}, T_{N-k+1}, \dots, T_{N-1}\}
-    \]
-\end{itemize}
-
-
-\textbf{Fonction:}
 \[
-N \geq 0 \land \forall i \cdot (i \in \{0, 1, \dots, N-1\} \Rightarrow T[i] \in \mathbb{Z}) 
+N \geq 0 \land \forall i \cdot (i \in 0 \dots N-1 \Rightarrow T[i] \in \mathbb{Z})
 \]
 \[
-\operatorname{prefixe\_suffixe}(T, N) \equiv \max\{k \mid 0 \leq k < N \land \prefixe(T, k) = \suffixe(T, k)\}
+\operatorname{prefixe\_suffixe}(T, N) \equiv \max\{k \mid k \in 0 \dots N-1 \land \forall i \cdot (i \in 0 \dots k - 1 \Rightarrow T[i] = T[N-k+i])\}
 \]
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Dans cette section, vous rédigez la production demandée pour le milestone.             %
-%                                                                                        %
-% Soyez le plus précis et complet possible.  Toute production ne correspondant pas à ce  %
-% qui est demandé sera considérée comme ``hors sujet'' et la séance de feedback sera     %
-% contreproductive.                                                                      %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 
 \section{Question(s)}
 %%%%%%%%%%%%%%%%%%%%%%%

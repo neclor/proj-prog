@@ -63,6 +63,8 @@ int file_extension_to_format(const char *filename, FormatPNM *format);
  * @param image (PNM**): A double pointer to a PNM image that will be
  *                       deallocated. The pointer is set to NULL after
  *                       deallocation.
+ *
+ * @post: *image = NULL
  */
 void free_pnm(PNM **image);
 

@@ -1,19 +1,24 @@
 /**
  * \file prefixe_suffixe.h
- * \brief Header pour le calcul de la longueur du plus long sous-tableau à la préfixe et suffixe.
- * \author Benoit Donnet, Géraldine Brieven -- Université de Liège (ULiège)
- * \version 0.1
- * \date 26/11/2024
+ * \brief Header for calculating the length of the longest subarray at the prefix and suffix.
+ * \author Pavlov Aleksandr
+ * \version 1.1
+ * \date 11/03/2025
  *
- * Implémente la p-compatibilité entre T1 et T2
+ * Implements p-compatibility between T1 and T2
 */
 
 #ifndef _PREFIXE_SUFFIXE_H
 #define _PREFIXE_SUFFIXE_H 1
 
 /**
- * @pre: T != NULL, N > 
- * @post: 
+ * @param T: input array.
+ * @param N: length of array T.
+ * 
+ * @pre: T != NULL, N > 0
+ * @post: T == T_0
+ * 
+ * @return: length of the longest subarray at the prefix and suffix
  */
 int prefixe_suffixe(int *T, const unsigned int N);
 

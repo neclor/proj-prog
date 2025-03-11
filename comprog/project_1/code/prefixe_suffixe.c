@@ -3,33 +3,35 @@
 
 #include "prefixe_suffixe.h"
 
-#include <stdio.h>
+
+// ===== Prototypes =====
 
 
-/*
- * Explication:
- * 
- *  
- * a b a b x a b a b b
- * 0 0 1 2 0 1 2 3 4 0 
- * 
- * a b a b
- * 0 0 1 2
- * 
-*/
+static int solution_1(int *T, const unsigned int N);
+static int solution_2(int *T, const unsigned int N);
+
+
+// ===== Code =====
+
 
 int prefixe_suffixe(int *T, const unsigned int N) {
+   int s1 = solution_1(T, N);
+   int s2 = solution_2(T, N);
+   if (s1 == s2) return s1;
+   return -1;
+}
+
+/* 
+ * Solution 1
+ * Сomplexity: O(n)
+ */
+static int solution_1(int *T, const unsigned int N) {
+   assert(N > 0);
+
    int p[N];
-   unsigned k = 0;
+   unsigned int k = 0;
 
-   // initialize p[N] with 0
-   for (unsigned i = 0; i < N; ++i) {
-      p[i] = 0;
-   }
-
-//     ------------- ------------- 
-// T = a b c d a b c a b c d a b c d a b
-// p = 0 0 0 0 1 2 3 1 2 3 4 5 6 7 4
+   for (unsigned int i = 0; i < N; ++i) p[i] = 0; // initialize p[N] with 0
 
    unsigned int i = 1;
    while (i < N) {
@@ -47,17 +49,31 @@ int prefixe_suffixe(int *T, const unsigned int N) {
       }
    }
 
-   for (unsigned i = 0; i < N; ++i) {
-      printf("%d, ", p[i]);
-   }
-
    return p[N-1];
 }
 
-// gcc code/main-prefixe_suffixe.c code/prefixe_suffixe.c
+/* 
+ * Solution 2
+ * Сomplexity: O(n^2)
+ */
+static int solution_2(int *T, const unsigned int N) {
+   assert(N > 0);
 
-// -----   -----
-// a b c d a b c a b c d a b c d a b
-// 
-// 0 0 0 0 1 2 3 1 2 3 4 5 6 7 4 5 6
-//
+   for (unsigned int k = N - 1; k >= 1; --k) {
+      int flag = 1;
+
+      for (unsigned int i = 0; i <= k - 1; i++) {
+         if (T[i] != T[N - k + i]) {
+            flag = 0;
+            break;
+         }
+      }
+
+      if (flag) return k;
+   }
+
+   return 0;
+}
+
+// gcc code/main-prefixe_suffixe.c code/prefixe_suffixe.c
+// ./a.out

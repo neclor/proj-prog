@@ -7,72 +7,45 @@
 // ===== Prototypes =====
 
 
-static int solution_1(int *T, const unsigned int N);
-static int solution_2(int *T, const unsigned int N);
+/**
+ * Sp _
+ * Checking if a prefix of length k matches the suffix of the given array.
+ * 
+ * Сomplexity: O(n)
+ * 
+ * @param T: input array.
+ * @param N: length of array T.
+ * @param k: length of prefix and suffix.
+ * 
+ * @pre: T != NULL, 0 < N, 0 < k < N
+ * @post: T == T_0
+ * 
+ * @return:
+ *     0 Prefix and suffix are NOT equal
+ *     1 Prefix and suffix are equal
+ */
+static int pref_equal_suff(int *T, const unsigned int N, unsigned int k);
 
 
 // ===== Code =====
 
 
 int prefixe_suffixe(int *T, const unsigned int N) {
-   int s1 = solution_1(T, N);
-   int s2 = solution_2(T, N);
-   if (s1 == s2) return s1;
-   return -1;
-}
+   assert((T != NULL) && (0 < N));
 
-/* 
- * Solution 1
- * Сomplexity: O(n)
- */
-static int solution_1(int *T, const unsigned int N) {
-   assert(N > 0);
-
-   int p[N];
-   unsigned int k = 0;
-
-   for (unsigned int i = 0; i < N; ++i) p[i] = 0; // initialize p[N] with 0
-
-   unsigned int i = 1;
-   while (i < N) {
-      if (T[i] == T[k]) {
-         ++k;
-         p[i] = k;
-         ++i;
-      } else {
-         if (k == 0) {
-            p[i] = 0;
-            ++i;
-         } else {
-            k = p[k - 1];
-         }
-      }
+   for (unsigned int k = N - 1; k > 0; --k) {
+      if (pref_equal_suff(T, N, k)) return k;
    }
-
-   return p[N-1];
-}
-
-/* 
- * Solution 2
- * Сomplexity: O(n^2)
- */
-static int solution_2(int *T, const unsigned int N) {
-   assert(N > 0);
-
-   for (unsigned int k = N - 1; k >= 1; --k) {
-      int flag = 1;
-
-      for (unsigned int i = 0; i <= k - 1; i++) {
-         if (T[i] != T[N - k + i]) {
-            flag = 0;
-            break;
-         }
-      }
-
-      if (flag) return k;
-   }
-
    return 0;
+}
+
+static int pref_equal_suff(int *T, const unsigned int N, const unsigned int k) {
+   assert((T != NULL) && (0 < N) && (0 < k && k < N));
+
+   for (unsigned int i = 0; i <= k - 1; i++) {
+      if (T[i] != T[N - k + i]) return 0;
+   }
+   return 1;
 }
 
 // gcc code/main-prefixe_suffixe.c code/prefixe_suffixe.c

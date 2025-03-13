@@ -1,33 +1,27 @@
 TARGET = app
 
 SRC_DIR	= src
-INC_DIR	= include
-BIN_DIR = bin
 LIB_DIR	= lib
+OBJ_DIR = build
 
 CC = gcc
-CFLAGS = --std=c99 --pedantic -Wall -W -Wmissing-prototypes $(pkg-config --cflags gtk+-2.0) -I $(INC_DIR)
+CFLAGS = --std=c99 --pedantic -Wall -W -Wmissing-prototypes $(pkg-config --cflags gtk+-2.0)
 LDFLAGS = $(pkg-config --libs gtk+-2.0)
 
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(BIN_DIR)/%.o, $(SRCS))
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(СС) $(OBJS) -o $@ $(LDFLAGS)
 
-$(BIN_DIR)/%.o: $(SRC_DIR)/%.c $(INC_DIR)/*.h
-	mkdir -p $(BIN_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(BIN_DIR) $(TARGET)
-
-test: $(TARGET)
-	./$(TARGET) -f pbm -i test_image/test.pbm -o test_image/result.pbm
-	./$(TARGET) -f pgm -i test_image/test.pgm -o test_image/result.pgm
-	./$(TARGET) -f ppm -i test_image/test.ppm -o test_image/result.ppm
+	rm -f $(OBJ_DIR) $(TARGET)
 
 git:
 	git pull

@@ -73,7 +73,7 @@ void free_pnm(PNM **image);
  *                       of the loaded image to.
  * @param filename (const char*): the path to the file containing the image.
  *
- * @pre: image != NULL, filename != NULL
+ * @pre: image != NULL
  * @post: image points to the image loaded from the file.
  *
  * @return:
@@ -90,7 +90,7 @@ int load_pnm(PNM **image, const char* filename);
  * @param image (PNM*): a pointer to PNM.
  * @param filename (const char*): the path to the destination file.
  *
- * @pre: image != NULL, filename != NULL
+ * @pre: image != NULL
  * @post: the file filename contains the PNM image.
  *
  * @return:

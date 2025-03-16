@@ -20,6 +20,8 @@
         "stddef.h": "c",
         "string.h": "c",
         "strings.h": "c",
-        "gtk.h": "c"
+        "gtk.h": "c",
+        "compare": "c",
+        "inttypes.h": "c"
     }
 }

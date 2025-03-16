@@ -1,41 +1,49 @@
-# Makefile
-# By: Pavlov Aleksandr s2400691
-# INFO0030: Projet 1
+TARGET = filtre
 
-TARGET = pnm
+
+SRC_DIR	= src
+LIB_DIR	= lib
+OBJ_DIR = build
+
 
 CC = gcc
 CFLAGS = --std=c99 --pedantic -Wall -W -Wmissing-prototypes
-LD = gcc
 LDFLAGS =
 
-SRC_DIR = src
-OBJ_DIR = bin
 
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/pnm.o
+SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
 
 all: $(TARGET)
 
+
 $(TARGET): $(OBJS)
-	$(LD) $^ -o $@ $(LDFLAGS)
+	$(СС) $(OBJS) -o $@ $(LDFLAGS)
 
-$(OBJ_DIR)/main.o: $(SRC_DIR)/main.c
-	mkdir -p $(OBJ_DIR)
-	$(CC) -c $(SRC_DIR)/main.c -o $@ $(CFLAGS)
 
-$(OBJ_DIR)/pnm.o: $(SRC_DIR)/pnm.c $(SRC_DIR)/pnm.h
-	$(CC) -c $(SRC_DIR)/pnm.c -o $@ $(CFLAGS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 clean:
-	rm -f $(OBJ_DIR)/*.o $(TARGET)
+	rm -f $(OBJ_DIR) $(TARGET)
 
-test: $(TARGET)
-	./$(TARGET) -f pbm -i test_image/test.pbm -o test_image/result.pbm
-	./$(TARGET) -f pgm -i test_image/test.pgm -o test_image/result.pgm
-	./$(TARGET) -f ppm -i test_image/test.ppm -o test_image/result.ppm
+
+
+
+pnm_tests:
+
+
+pnm_librairie:
+
+
+doc:
+
 
 git:
 	git pull
 	git add .
-	git commit -m "Makefile push"
+	git commit -m Update
 	git push

@@ -9,8 +9,11 @@ insert_final_newline = true
 [*.md]
 trim_trailing_whitespace = false
 indent_style = tab
-indent_size = 4
 tab_width = 4
+
+[{CMakeLists.txt,*.cmake,*.rst}]
+indent_style = space
+indent_size = 2
 
 [Makefile]
 indent_style = tab
@@ -19,4 +22,3 @@ tab_width = 4
 [*.{c,h}]
 indent_style = space
 indent_size = 3
-tab_width = 3

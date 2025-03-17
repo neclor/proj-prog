@@ -162,7 +162,7 @@ int black_and_white(PNM *image, const char *parameter) {
    if (threshold < 0 || 255 < threshold) return 3;
 
    if (image->format == FORMAT_PPM) {
-      if (fifty_shades_of_grey(image, "2"));
+      if (fifty_shades_of_grey(image, "2") != 0) return 1;
    }
 
    unsigned int width = image->width;

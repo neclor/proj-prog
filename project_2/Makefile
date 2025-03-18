@@ -7,8 +7,9 @@ OBJ_DIR = build
 
 
 CC = gcc
-CFLAGS = --std=c99 --pedantic -Wall -W -Wmissing-prototypes
-LDFLAGS =
+CFLAGS = -I $(SRC_DIR) -I lib/pnm/include
+CFLAGS += --std=c99 --pedantic -Wall -W -Wextra -Wmissing-prototypes
+LDFLAGS = lib/pnm/libpnm.a
 
 
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
@@ -28,7 +29,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 
 clean:
-	rm -f $(OBJ_DIR) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET)
 
 
 
@@ -37,6 +38,7 @@ pnm_tests:
 
 
 pnm_librairie:
+	make -C lib/pnm
 
 
 doc:

@@ -1,13 +1,26 @@
 /**
- * @author: Pavlov Aleksandr s2400691
- * @date: 05.03.2025
- * @projet: INFO0030 Projet 1
+ * @file pnm.h
+ * @brief Header file for handling PNM images library.
+ *
+ * Supported formats:
+ * - PBM (Portable Bitmap)
+ * - PGM (Portable Graymap)
+ * - PPM (Portable Pixmap)
+ *
+ * @author Pavlov Aleksandr (s2400691)
+ * @date 24.03.2025
 */
 
-
 #ifndef _PNM_H
-#define _PNM_H 1
+#define _PNM_H
 
+#include <stdint.h>
+
+/* ======= Constants ======= */
+
+#define PBM_MAX_VALUE 1
+#define PGM_MAX_VALUE 255
+#define PPM_MAX_VALUE 65535
 
 #define PNM_LOAD_SUCCESS 0
 #define PNM_LOAD_MEMORY_ERROR -1
@@ -18,86 +31,151 @@
 #define PNM_WRITE_INVALID_FILENAME -1
 #define PNM_WRITE_FILE_MANIPULATION_ERROR -2
 
+/* ======= Enums ======= */
 
+/**
+ * @brief Enum for PNM image formats.
+ */
 typedef enum FormatPNM_t {
-    FORMAT_PBM,
-    FORMAT_PGM,
-    FORMAT_PPM
+   FORMAT_PBM,
+   FORMAT_PGM,
+   FORMAT_PPM
 } FormatPNM;
 
+/* ======= Structures ======= */
+
+/**
+ * @brief Structure representing a PNM image.
+ */
 typedef struct PNM_t PNM;
 
+/* ======= Function Prototypes ======= */
 
 /**
- * Converts a string to the corresponding FormatPNM enum value.
+ * @brief Retrieves the format of a PNM image.
  *
- * @param format (FormatPNM*): Pointer to store the resulting enum value.
- * @param format_string (const char*): String representation of the format.
+ * @param image Pointer to the PNM image.
  *
- * @pre: format != NULL
+ * @pre image != NULL
  *
- * @return:
- *     0 Success
- *     1 If the string does not match any format
+ * @return
+ *     Format of the image
+ *    -1 if image == NULL
  */
-int str_to_format(const char *format_string, FormatPNM *format);
+FormatPNM get_format(PNM *image);
 
 /**
- * Determines the file format based on the filename extension and sets
- * the corresponding FormatPNM enum value.
+ * @brief Retrieves the width of a PNM image.
  *
- * @param format (FormatPNM*): Pointer to store the resulting enum value.
- * @param filename (const char*): Name of the file to analyze.
+ * @param image Pointer to the PNM image.
  *
- * @pre: format != NULL
+ * @pre image != NULL
  *
- * @return:
- *     0 Success
- *     1 If file extension does not match any format
+ * @return
+ *     Width of the image
+ *     0 if image == NULL
  */
-int file_extension_to_format(const char *filename, FormatPNM *format);
+unsigned int get_width(PNM *image);
 
 /**
- * Frees the memory allocated for a PNM image.
+ * @brief Retrieves the height of a PNM image.
  *
- * @param image (PNM**): A double pointer to a PNM image that will be
- *                       deallocated. The pointer is set to NULL after
- *                       deallocation.
+ * @param image Pointer to the PNM image.
+ *
+ * @pre image != NULL
+ *
+ * @return
+ *     Height of the image
+ *     0 if image == NULL
+ */
+unsigned int get_height(PNM *image);
+
+/**
+ * @brief Retrieves the maximum pixel value of a PNM image.
+ *
+ * @param image Pointer to the PNM image.
+ *
+ * @pre image != NULL
+ *
+ * @return
+ *     Maximum pixel value
+ *     0 if image == NULL
+ */
+uint16_t get_max_value(PNM *image);
+
+/**
+ * @brief Retrieves the pixel data of a PNM image.
+ *
+ * @param image Pointer to the PNM image.
+ *
+ * @pre image != NULL
+ *
+ * @return
+ *     Pointer to the pixel data
+ *     NULL if image == NULL
+ */
+uint16_t *get_data(PNM *image);
+
+/**
+ * @brief Sets the properties of a PNM image.
+ *
+ * @param image Pointer to the PNM image.
+ * @param format Format of the image.
+ * @param width Width of the image.
+ * @param height Height of the image.
+ * @param max_value Maximum pixel value.
+ * @param data Pointer to the pixel data.
+ *
+ * @pre image != NULL
+ *
+ */
+void set_pnm(
+   PNM *image,
+   FormatPNM format,
+   unsigned int width,
+   unsigned int height,
+   uint16_t max_value,
+   uint16_t *data
+);
+
+/**
+ * @brief Frees the memory allocated for a PNM image.
+ *
+ * @param image Pointer to the pointer of the PNM image to free.
+ *
+ * @pre image != NULL, *image != NULL
  */
 void free_pnm(PNM **image);
 
 /**
- * Loads a PNM image from a file.
+ * @brief Loads a PNM image from a file.
  *
- * @param image (PNM**): the address of a pointer on PNM to write the address
- *                       of the loaded image to.
- * @param filename (const char*): the path to the file containing the image.
+ * @param image Pointer to store the loaded PNM image.
+ * @param filename Path to the file to load.
  *
- * @pre: image != NULL
- * @post: image points to the image loaded from the file.
+ * @pre image != NULL, filename != NULL
  *
- * @return:
- *     0 Success
- *    -1 Memory allocation error
- *    -2 Malformed file name
- *    -3 Malformed file content
+ * @return
+ *     PNM_LOAD_SUCCESS (0) on success
+ *     PNM_LOAD_INVALID_FILENAME (-2) filename is invalid
+ *     PNM_LOAD_MEMORY_ERROR (-1) memory allocation error
+ *     PNM_LOAD_DECODE_ERROR (-3) decode error
  */
-int load_pnm(PNM **image, const char* filename);
+int load_pnm(PNM **image, const char *filename);
 
 /**
- * Saves a PNM image to a file.
+ * @brief Writes a PNM image to a file.
  *
- * @param image (PNM*): a pointer to PNM.
- * @param filename (const char*): the path to the destination file.
+ * @param image Pointer to the PNM image to write.
+ * @param filename Path to the file to write to.
  *
- * @pre: image != NULL
- * @post: the file filename contains the PNM image.
+ * @pre image != NULL, filename != NULL
  *
- * @return:
- *     0 Success
- *    -1 Malformed file name
- *    -2 Error while manipulating the file
+ * @return
+ *     PNM_WRITE_SUCCESS (0) on success
+ *     PNM_WRITE_INVALID_FILENAME (-1) filename is invalid
+ *     PNM_WRITE_FILE_MANIPULATION_ERROR (-2) writing to the file error
  */
-int write_pnm(PNM *image, const char* filename);
+int write_pnm(PNM *image, const char *filename);
 
-#endif // pnm.h
+#endif // _PNM_H

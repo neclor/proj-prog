@@ -1,8 +1,9 @@
 /**
  * @file main.c
- * @author: Pavlov Aleksandr s2400691
- * @date: 24.03.2025
- * @brief Main file
+ * @brief
+ *
+ * @author Pavlov Aleksandr (s2400691)
+ * @date 24.03.2025
 */
 
 #include <getopt.h>
@@ -10,11 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "pnm.h"
 #include "filter.h"
-#include "pnm/pnm.h"
 
 
-#define PROGRAM_NAME "./filtre"
 #define VERSION "0.1.0"
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
 
@@ -36,9 +36,7 @@ static struct option const longopts[] = {
 
 const char *program_name;
 
-
-// ======= Prototypes =======
-
+/* ======= Function Prototypes ======= */
 
 /**
  * @brief Displays help about using the command and exits the program.
@@ -47,17 +45,13 @@ const char *program_name;
  */
 static void usage(int status);
 
-
-// ======= Code =======
-
+/* ======= Functions ======= */
 
 /**
- * @brief Main function.
+ * @brief
  *
  * @param argc
  * @param argv
- *
- * @return
  */
 int main(int argc, char **argv) {
    program_name = argv[0];
@@ -87,7 +81,7 @@ int main(int argc, char **argv) {
             break;
          case GETOPT_VERSION_CHAR:
             fprintf(stdout, "%s %s\n\nWritten by %s.\n",
-               PROGRAM_NAME, VERSION, AUTHORS);
+               program_name, VERSION, AUTHORS);
             exit(EXIT_SUCCESS);
             break;
          default:
@@ -98,12 +92,10 @@ int main(int argc, char **argv) {
    if (input_filename == NULL) {
       fprintf(stderr, "%s: missing '-i' argument\n", program_name);
       usage(EXIT_FAILURE);
-   }
-   if (output_filename == NULL) {
+   } else if (output_filename == NULL) {
       fprintf(stderr, "%s: missing '-o' argument\n", program_name);
       usage(EXIT_FAILURE);
-   }
-   if (filter_string == NULL) {
+   } else if (filter_string == NULL) {
       fprintf(stderr, "%s: missing '-f' argument\n", program_name);
       usage(EXIT_FAILURE);
    }
@@ -111,108 +103,89 @@ int main(int argc, char **argv) {
    PNM *image = NULL;
 
    switch (load_pnm(&image, input_filename)) {
-      case PNM_LOAD_SUCCESS:
+      case PNM_SUCCESS:
          break;
-      case PNM_LOAD_MEMORY_ERROR:
-         fprintf(stderr, "%s: ", program_name);
-         perror("");
-         return EXIT_FAILURE;
-      case PNM_LOAD_INVALID_FILENAME:
+      case PNM_INVALID_FILENAME:
          fprintf(stderr, "%s: invalid filename '%s': ",
             program_name, input_filename);
          perror("");
          return EXIT_FAILURE;
-      case PNM_LOAD_DECODE_ERROR:
+      case LOAD_PNM_MEMORY_ERROR:
+         fprintf(stderr, "%s: ", program_name);
+         perror("");
+         return EXIT_FAILURE;
+      case LOAD_PNM_DECODE_ERROR:
          fprintf(stderr, "%s: '%s': decode error\n",
             program_name, input_filename);
          return EXIT_FAILURE;
       default:
+         fprintf(stderr, "%s: error:", program_name);
          perror("");
          return EXIT_FAILURE;
    }
 
-   int ok = 1;
+   int result_code;
    if (!strcasecmp(filter_string, "retournement")) {
-      switch (turnaround(image)) {
-         case 0:
-            break;
-         case 1:
-            int ok = 0;
-            fprintf(stderr, "%s: filter error", program_name);
-            break;
-         default:
-            int ok = 0;
-            perror("");
-            break;
-      }
+      result_code = turnaround(image);
    } else if (!strcasecmp(filter_string, "monochrome")) {
-      switch (monochrome(image, parameter_string)) {
-         case 0:
-            break;
-         case 1:
-            int ok = 0;
-            break;
-         default:
-            int ok = 0;
-            break;
-      }
+      result_code = monochrome(image, parameter_string);
    } else if (!strcasecmp(filter_string, "negatif")) {
-      switch (negatif(image)) {
-         case 0:
-            break;
-         case 1:
-            int ok = 0;
-            break;
-         default:
-            int ok = 0;
-            break;
-      }
+      result_code = negative(image);
    } else if (!strcasecmp(filter_string, "gris")) {
-
+      result_code = fifty_shades_of_grey(image, parameter_string);
    } else if (!strcasecmp(filter_string, "NB")) {
-
+      result_code = black_and_white(image, parameter_string);
    } else {
-      fprintf(stderr, "%s: '%s': invalid filter\n",
+      fprintf(stderr, "%s: invalid filter name '%s'\n",
          program_name, filter_string);
+      free_pnm(&image);
+      usage(EXIT_FAILURE);
    }
 
-
-   free_pnm(&image);
-
-
-   retournement
-
-   monochrome r   v b
-   negatif
-   gris       1 2
-   NB 0 до 255
-
-
-
-
-
-
-
-
-
-   switch (write_pnm(image, output_filename)) {
-      case PNM_WRITE_SUCCESS:
+   switch(result_code) {
+      case FILTER_SUCCESS:
          break;
-      case PNM_WRITE_INVALID_FILENAME:
-         ok = 0;
+      case FILTER_WRONG_IMAGE_FORMAT:
+         fprintf(stderr, "%s: incompatible filter and image format\n",
+            program_name);
+         free_pnm(&image);
+         usage(EXIT_FAILURE);
+      case FILTER_INVALID_PARAMETER:
+         if (parameter_string == NULL) {
+            fprintf(stderr, "%s: missing '-p' argument\n", program_name);
+         } else {
+            fprintf(stderr, "%s: '%s': invalid argument\n",
+               program_name, parameter_string);
+         }
+         free_pnm(&image);
+         usage(EXIT_FAILURE);
+      default:
+         fprintf(stderr, "%s: error: ", program_name);
+         perror("");
+         free_pnm(&image);
+         return EXIT_FAILURE;
+   }
+
+   int ok = 1;
+   switch (write_pnm(image, output_filename)) {
+      case PNM_SUCCESS:
+         break;
+      case PNM_INVALID_FILENAME:
          fprintf(stderr, "%s: invalid filename '%s': ",
             program_name, output_filename);
          perror("");
-         break;
-      case PNM_WRITE_FILE_MANIPULATION_ERROR:
          ok = 0;
+         break;
+      case WRITE_PNM_FILE_MANIPULATION_ERROR:
          fprintf(stderr, "%s: '%s': file manipulation error: ",
             program_name, output_filename);
          perror("");
+         ok = 0;
          break;
       default:
-         ok = 0;
+         fprintf(stderr, "%s: error: ", program_name);
          perror("");
+         ok = 0;
    }
 
    free_pnm(&image);
@@ -225,16 +198,23 @@ static void usage(int status) {
       fprintf(stderr, "Try '%s --help' for more information.\n",
          program_name);
    } else {
-      printf("Usage: %s [-f FORMAT] -i SOURCE -o DEST\n", program_name);
+      printf("Usage: %s -i SOURCE -f FILTER [-p PARAM] -o DEST\n",
+         program_name);
       fputs("\
 Manipulates PNM format files.\n\
 \n\
 Mandatory arguments to long options are mandatory for short options too.\n\
-  -f, --format=FORMAT          specify format FORMAT={PBM,PGM,PPM}\n\
-  -i, --input=FILE             specify input file {.ppm,.pbm,.pgm}\n\
-  -o, --output=FILE            specify output file {.ppm,.pbm,.pgm}\n\
-      --help        display this help and exit\n\
-      --version     output version information and exit\n\
+  -i, --input=FILE             specify input file (.ppm, .pbm, .pgm)\n\
+  -o, --output=FILE            specify output file (.ppm, .pbm, .pgm)\n\
+  -f, --filter=FILTER          specify filter to apply:\n\
+                                 retournement       (no parameter required)\n\
+                                 monochrome         (requires PARAM: 'r', 'v', or 'b')\n\
+                                 negatif            (no parameter required)\n\
+                                 gris               (requires PARAM: '1' or '2')\n\
+                                 NB                 (requires PARAM: threshold value 0-255)\n\
+  -p, --parameter=PARAM        specify additional parameter for the filter (if required)\n\
+      --help                   display this help and exit\n\
+      --version                output version information and exit\n\
 ", stdout);
    }
    exit(status);

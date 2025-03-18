@@ -255,11 +255,11 @@ int load_pnm(PNM **image, const char *filename) {
 
    FormatPNM file_extension;
    if (file_extension_to_format(filename, &file_extension) != 0) {
-      return PNM_LOAD_INVALID_FILENAME;
+      return PNM_INVALID_FILENAME;
    }
 
    FILE *file = fopen(filename, "r");
-   if (file == NULL) return PNM_LOAD_INVALID_FILENAME;
+   if (file == NULL) return PNM_INVALID_FILENAME;
 
    FormatPNM format;
    unsigned int width;
@@ -268,12 +268,12 @@ int load_pnm(PNM **image, const char *filename) {
 
    if (read_header(file, &format, &width, &height, &max_value) != 0) {
       if (fclose(file) != 0) return -4;
-      return PNM_LOAD_DECODE_ERROR;
+      return LOAD_PNM_DECODE_ERROR;
    }
 
    if (file_extension != format) {
       if (fclose(file) != 0) return -4;
-      return PNM_LOAD_DECODE_ERROR;
+      return LOAD_PNM_DECODE_ERROR;
    }
 
    size_t data_count = width * height;
@@ -282,20 +282,20 @@ int load_pnm(PNM **image, const char *filename) {
    uint16_t *data = malloc(data_count * sizeof(uint16_t));
    if (data == NULL) {
       if (fclose(file) != 0) return -4;
-      return PNM_LOAD_MEMORY_ERROR;
+      return LOAD_PNM_MEMORY_ERROR;
    }
 
    if (read_data(file, max_value, data_count, data) != 0) {
       free(data);
       if (fclose(file) != 0) return -4;
-      return PNM_LOAD_DECODE_ERROR;
+      return LOAD_PNM_DECODE_ERROR;
    }
 
    *image = malloc(sizeof(PNM));
    if (*image == NULL) {
       free(data);
       if (fclose(file) != 0) return -4;
-      return PNM_LOAD_MEMORY_ERROR;
+      return LOAD_PNM_MEMORY_ERROR;
    }
 
    set_pnm(*image, format, width, height, max_value, data);
@@ -304,37 +304,37 @@ int load_pnm(PNM **image, const char *filename) {
       free_pnm(image);
       return -4;
    }
-   return PNM_LOAD_SUCCESS;
+   return PNM_SUCCESS;
 }
 
 int write_pnm(PNM *image, const char *filename) {
    if (image == NULL || filename == NULL) return -4;
 
    if (check_invalid_characters(filename) != 0) {
-      return PNM_WRITE_INVALID_FILENAME;
+      return PNM_INVALID_FILENAME;
    }
 
    FormatPNM file_extension;
    if (file_extension_to_format(filename, &file_extension) != 0) {
-      return PNM_WRITE_INVALID_FILENAME;
+      return PNM_INVALID_FILENAME;
    }
-   if (image->format != file_extension) return PNM_WRITE_INVALID_FILENAME;
+   if (image->format != file_extension) return PNM_INVALID_FILENAME;
 
    FILE *file = fopen(filename, "w");
-   if (file == NULL) return PNM_WRITE_INVALID_FILENAME;
+   if (file == NULL) return PNM_INVALID_FILENAME;
 
    if (write_header(file, image) != 0) {
-      if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
-      return PNM_WRITE_FILE_MANIPULATION_ERROR;
+      if (fclose(file) != 0) return WRITE_PNM_FILE_MANIPULATION_ERROR;
+      return WRITE_PNM_FILE_MANIPULATION_ERROR;
    }
 
    if (write_data(file, image) != 0) {
-      if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
-      return PNM_WRITE_FILE_MANIPULATION_ERROR;
+      if (fclose(file) != 0) return WRITE_PNM_FILE_MANIPULATION_ERROR;
+      return WRITE_PNM_FILE_MANIPULATION_ERROR;
    }
 
-   if (fclose(file) != 0) return PNM_WRITE_FILE_MANIPULATION_ERROR;
-   return 0;
+   if (fclose(file) != 0) return WRITE_PNM_FILE_MANIPULATION_ERROR;
+   return PNM_SUCCESS;
 }
 
 /* ======= Internal functions ======= */

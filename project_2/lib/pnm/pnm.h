@@ -22,14 +22,13 @@
 #define PGM_MAX_VALUE 255
 #define PPM_MAX_VALUE 65535
 
-#define PNM_LOAD_SUCCESS 0
-#define PNM_LOAD_MEMORY_ERROR -1
-#define PNM_LOAD_INVALID_FILENAME -2
-#define PNM_LOAD_DECODE_ERROR -3
+#define PNM_SUCCESS 0
+#define PNM_INVALID_FILENAME -1
 
-#define PNM_WRITE_SUCCESS 0
-#define PNM_WRITE_INVALID_FILENAME -1
-#define PNM_WRITE_FILE_MANIPULATION_ERROR -2
+#define LOAD_PNM_MEMORY_ERROR -2
+#define LOAD_PNM_DECODE_ERROR -3
+
+#define WRITE_PNM_FILE_MANIPULATION_ERROR -2
 
 /* ======= Enums ======= */
 
@@ -60,7 +59,7 @@ typedef struct PNM_t PNM;
  *
  * @return
  *     Format of the image
- *    -1 if image == NULL
+ *    -1: image == NULL
  */
 FormatPNM get_format(PNM *image);
 
@@ -73,7 +72,7 @@ FormatPNM get_format(PNM *image);
  *
  * @return
  *     Width of the image
- *     0 if image == NULL
+ *     0: image == NULL
  */
 unsigned int get_width(PNM *image);
 
@@ -86,7 +85,7 @@ unsigned int get_width(PNM *image);
  *
  * @return
  *     Height of the image
- *     0 if image == NULL
+ *     0: image == NULL
  */
 unsigned int get_height(PNM *image);
 
@@ -99,7 +98,7 @@ unsigned int get_height(PNM *image);
  *
  * @return
  *     Maximum pixel value
- *     0 if image == NULL
+ *     0: image == NULL
  */
 uint16_t get_max_value(PNM *image);
 
@@ -112,7 +111,7 @@ uint16_t get_max_value(PNM *image);
  *
  * @return
  *     Pointer to the pixel data
- *     NULL if image == NULL
+ *     NULL : image == NULL
  */
 uint16_t *get_data(PNM *image);
 
@@ -127,7 +126,6 @@ uint16_t *get_data(PNM *image);
  * @param data Pointer to the pixel data.
  *
  * @pre image != NULL
- *
  */
 void set_pnm(
    PNM *image,
@@ -156,10 +154,10 @@ void free_pnm(PNM **image);
  * @pre image != NULL, filename != NULL
  *
  * @return
- *     PNM_LOAD_SUCCESS (0) on success
- *     PNM_LOAD_INVALID_FILENAME (-2) filename is invalid
- *     PNM_LOAD_MEMORY_ERROR (-1) memory allocation error
- *     PNM_LOAD_DECODE_ERROR (-3) decode error
+ *     0: Success
+ *    -2: Invalid filename
+ *    -1: Memory allocation failure
+ *    -3: Decode error
  */
 int load_pnm(PNM **image, const char *filename);
 
@@ -172,9 +170,9 @@ int load_pnm(PNM **image, const char *filename);
  * @pre image != NULL, filename != NULL
  *
  * @return
- *     PNM_WRITE_SUCCESS (0) on success
- *     PNM_WRITE_INVALID_FILENAME (-1) filename is invalid
- *     PNM_WRITE_FILE_MANIPULATION_ERROR (-2) writing to the file error
+ *     0: Success
+ *    -1: Invalid filename
+ *    -2: Writing file error
  */
 int write_pnm(PNM *image, const char *filename);
 

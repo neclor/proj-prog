@@ -12,11 +12,12 @@
 #include <strings.h>
 
 #include "pnm.h"
+#include "filter.h"
 
 /* ======= External Functions ======= */
 
 int turnaround(PNM *image) {
-   if (image == NULL) return -1;
+   if (image == NULL) return -3;
 
    FormatPNM format = get_format(image);
    unsigned int width = get_width(image);
@@ -39,12 +40,13 @@ int turnaround(PNM *image) {
          data[j] = temp;
       }
    }
-   return 0;
+   return FILTER_SUCCESS;
 }
 
 int monochrome(PNM *image, const char *parameter) {
-   if (image == NULL || parameter == NULL) return -1;
-   if (get_format(image) != FORMAT_PPM) return -2;
+   if (image == NULL) return -3;
+   if (parameter == NULL) return FILTER_INVALID_PARAMETER;
+   if (get_format(image) != FORMAT_PPM) return FILTER_WRONG_IMAGE_FORMAT;
 
    unsigned int p;
    if (!strcasecmp(parameter, "r")) {
@@ -54,7 +56,7 @@ int monochrome(PNM *image, const char *parameter) {
    } else if (!strcasecmp(parameter, "b")) {
       p = 2;
    } else {
-      return -3;
+      return FILTER_INVALID_PARAMETER;
    }
 
    unsigned int width = get_width(image);
@@ -68,12 +70,12 @@ int monochrome(PNM *image, const char *parameter) {
       for (int a = 0; a < 3; ++a) data[3 * i + a] = 0;
       data[3 * i + p] = temp;
    }
-   return 0;
+   return FILTER_SUCCESS;
 }
 
 int negative(PNM *image) {
-   if (image == NULL) return -1;
-   if (get_format(image) != FORMAT_PPM) return -2;
+   if (image == NULL) return -3;
+   if (get_format(image) != FORMAT_PPM) return FILTER_WRONG_IMAGE_FORMAT;
 
    uint16_t max_value = get_max_value(image);
    uint16_t *data = get_data(image);
@@ -83,16 +85,17 @@ int negative(PNM *image) {
    for (size_t i = 0; i < data_count; ++i) {
       data[i] = max_value - data[i];
    }
-   return 0;
+   return FILTER_SUCCESS;
 }
 
 int fifty_shades_of_grey(PNM *image, const char *parameter) {
-   if (image == NULL || parameter == NULL) return -1;
-   if (get_format(image) != FORMAT_PPM) return -2;
+   if (image == NULL) return -3;
+   if (parameter == NULL) return FILTER_INVALID_PARAMETER;
+   if (get_format(image) != FORMAT_PPM) return FILTER_WRONG_IMAGE_FORMAT;
 
    int mode;
-   if (sscanf(parameter, "%d", &mode) != 1) return -3;
-   if (mode != 1 && mode != 2) return -3;
+   if (sscanf(parameter, "%d", &mode) != 1) return FILTER_INVALID_PARAMETER;
+   if (mode != 1 && mode != 2) return FILTER_INVALID_PARAMETER;
 
    unsigned int width = get_width(image);
    unsigned int height = get_height(image);
@@ -121,21 +124,24 @@ int fifty_shades_of_grey(PNM *image, const char *parameter) {
 
    set_pnm(image, FORMAT_PGM, width, height, PGM_MAX_VALUE, new_data);
    free(data);
-   return 0;
+   return FILTER_SUCCESS;
 }
 
 int black_and_white(PNM *image, const char *parameter) {
-   if (image == NULL || parameter == NULL) return -1;
+   if (image == NULL) return -3;
+   if (parameter == NULL) return FILTER_INVALID_PARAMETER;
 
    FormatPNM format = get_format(image);
-   if (format == FORMAT_PBM ) return -2;
+   if (format == FORMAT_PBM ) return FILTER_WRONG_IMAGE_FORMAT;
 
    int threshold;
-   if (sscanf(parameter, "%d", &threshold) != 1) return -3;
-   if (threshold < 0 || 255 < threshold) return -3;
+   if (sscanf(parameter, "%d", &threshold) != 1) {
+      return FILTER_INVALID_PARAMETER;
+   }
+   if (threshold < 0 || 255 < threshold) return FILTER_INVALID_PARAMETER;
 
    if (format == FORMAT_PPM) {
-      if (fifty_shades_of_grey(image, "2") != 0) return -1;
+      if (fifty_shades_of_grey(image, "2") != 0) return -4;
    }
 
    unsigned int width = get_width(image);
@@ -149,5 +155,5 @@ int black_and_white(PNM *image, const char *parameter) {
    }
 
    set_pnm(image, FORMAT_PBM, width, height, PBM_MAX_VALUE, data);
-   return 0;
+   return FILTER_SUCCESS;
 }

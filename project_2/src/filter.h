@@ -2,49 +2,49 @@
  * @file filter.h
  * @brief Header file containing image processing function prototypes.
  *
- * @author Pavlov Aleksandr
+ * @author Pavlov Aleksandr (s2400691)
  * @date 24.03.2025
 */
 
 #ifndef _FILTER_H
 #define _FILTER_H
 
-#include "pnm/pnm.h"
+#include "pnm.h"
+
+/* ======= Constants ======= */
+
+#define FILTER_SUCCESS 0
+#define FILTER_WRONG_IMAGE_FORMAT -1
+#define FILTER_INVALID_PARAMETER -2
 
 /* ======= Function Prototypes ======= */
 
 /**
  * @brief Rotates the image by 180 degrees.
  *
- * Reverses the order of the pixels in the image, effectively rotating it by
- * 180 degrees.
- *
  * @param image Pointer to the PNM image structure.
  *
  * @pre image != NULL
  *
  * @return
- *     - 0: Success
- *     - 1: Error (e.g., image is NULL)
+ *     0: Success
+ *    -1: Image is NULL
  */
 int turnaround(PNM *image);
 
 /**
  * @brief Converts the image to monochrome based on a specific color channel.
  *
- * Extracts one of the red, green, or blue channels from a PPM image and sets
- * the other channels to zero, creating a monochrome image based on the
- * selected channel.
- *
  * @param image Pointer to the PNM image structure.
- * @param parameter A string indicating the color channel ("r", "v", or "b").
+ * @param parameter A string indicating the color channel ("r", "v", "b").
  *
  * @pre image != NULL, parameter != NULL
  *
  * @return
- *     - 0: Success
- *     - 1: Error (e.g., invalid parameter)
- *     - 2: Error (e.g., image is not in PPM format)
+ *     0: Success
+ *    -1: Image is NULL
+ *    -2: Image is not in PPM format
+ *    -3: Invalid parameter
  */
 int monochrome(PNM *image, const char *parameter);
 
@@ -59,9 +59,9 @@ int monochrome(PNM *image, const char *parameter);
  * @pre image != NULL
  *
  * @return
- *     - 0: Success
- *     - 1: Error (e.g., image is NULL)
- *     - 2: Error (e.g., image is not in PPM format)
+ *     0: Success
+ *    -1: Image is NULL
+ *    -2: Image is not in PPM format
  */
 int negative(PNM *image);
 
@@ -78,10 +78,10 @@ int negative(PNM *image);
  * @pre image != NULL, parameter != NULL
  *
  * @return
- *     - 0: Success
- *     - 1: Error (e.g., memory allocation failure)
- *     - 2: Error (e.g., image is not in PPM format)
- *     - 3: Error (e.g., invalid parameter)
+ *     0: Success
+ *    -1: Memory allocation failure
+ *    -2: Image is not in PPM format
+ *    -3: Invalid parameter
  */
 int fifty_shades_of_grey(PNM *image, const char *parameter);
 
@@ -98,9 +98,10 @@ int fifty_shades_of_grey(PNM *image, const char *parameter);
  * @pre image != NULL, parameter != NULL
  *
  * @return
- *     - 0: Success
- *     - 1: Error (e.g., invalid parameter)
- *     - 2: Error (e.g., image is not in PPM format)
+ *     0: Success
+ *    -1: Invalid parameter
+ *    -2: Image is not in PPM format
+ *    -3: Invalid parameter
  */
 int black_and_white(PNM *image, const char *parameter);
 

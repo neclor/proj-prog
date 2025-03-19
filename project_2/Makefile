@@ -44,6 +44,9 @@ $(TST_DIR)/$(OBJ_DIR)/%.o: $(TST_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c $< -o $@ $(TST_CFLAGS)
 
+pnm_clean:
+	@make -C $(LIB_DIR)/pnm clean
+
 doc:
 	@doxygen Doxyfile
 

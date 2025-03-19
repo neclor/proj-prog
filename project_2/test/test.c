@@ -20,7 +20,7 @@ static void test_load_pnm() {
    assert_true(load_pnm(NULL, image_pbm_path) < 0);
    assert_true(load_pnm(&image, NULL) < 0);
 
-   assert_int_equal(load_pnm(&image, "abc"), PNM_INVALID_FILENAME);
+   assert_int_equal(load_pnm(&image, "\0"), PNM_INVALID_FILENAME);
 
    assert_int_equal(load_pnm(&image, image_pbm_path), PNM_SUCCESS);
    assert_int_equal(get_format(image), FORMAT_PBM);

@@ -52,4 +52,4 @@ Mkfile.old
 dkms.conf
 
 # Doxygen
-doxy_docs/
+doc/

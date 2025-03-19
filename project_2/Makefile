@@ -51,6 +51,7 @@ doc:
 	@doxygen Doxyfile
 
 clean:
+	@make pnm_clean
 	@rm -rf $(OBJ_DIR) $(TARGET) $(TST_DIR)/$(OBJ_DIR) $(TEST)
 
 git:

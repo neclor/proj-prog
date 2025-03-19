@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include <cairo.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 // Функция для рисования (GTK2 использует expose-event)
 static gboolean expose_event_callback(GtkWidget *widget, GdkEventExpose *event, gpointer data) {
@@ -46,8 +47,21 @@ static gboolean custom_loop(gpointer data) {
     return TRUE; // Continue the loop
 }
 
+static guint timeout_id = 0; // Store the timeout ID
+
+// Функция для удаления пользовательского цикла
+static void remove_custom_loop() {
+    if (timeout_id != 0) {
+        g_source_remove(timeout_id);
+        timeout_id = 0;
+    }
+}
+
 int main(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
+    printf("edasdasda");
+
+    printf("GTK version: %d.%d.%d\n", gtk_get_major_version(), gtk_get_minor_version(), gtk_get_micro_version());
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Red Circle");
@@ -68,7 +82,10 @@ int main(int argc, char *argv[]) {
     gtk_widget_show_all(window);
 
     // Запускаем пользовательский цикл
-    g_timeout_add(16, custom_loop, drawing_area); // ~60 FPS
+    timeout_id = g_timeout_add(16, custom_loop, drawing_area); // ~60 FPS
+
+    // Пример: Удаляем цикл через 5 секунд
+    g_timeout_add_seconds(5, (GSourceFunc)remove_custom_loop, NULL);
 
     gtk_main();
 

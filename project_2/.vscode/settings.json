@@ -22,6 +22,8 @@
         "strings.h": "c",
         "gtk.h": "c",
         "compare": "c",
-        "inttypes.h": "c"
+        "inttypes.h": "c",
+        "filter.h": "c",
+        "seatest.h": "c"
     }
 }

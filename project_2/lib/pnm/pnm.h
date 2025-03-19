@@ -9,6 +9,7 @@
  *
  * @author Pavlov Aleksandr (s2400691)
  * @date 24.03.2025
+ * @version 2.0.0
 */
 
 #ifndef _PNM_H
@@ -158,6 +159,7 @@ void free_pnm(PNM **image);
  *    -2: Invalid filename
  *    -1: Memory allocation failure
  *    -3: Decode error
+ *    -4: Invalid argument
  */
 int load_pnm(PNM **image, const char *filename);
 

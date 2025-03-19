@@ -1,52 +1,60 @@
 TARGET = filtre
 
-
 SRC_DIR	= src
-LIB_DIR	= lib
 OBJ_DIR = build
+LIB_DIR	= lib
 
-
-CC = gcc
-CFLAGS = -I $(SRC_DIR) -I $(LIB_DIR)
-CFLAGS += --std=c99 --pedantic -Wall -W -Wextra -Wmissing-prototypes
-LDFLAGS = lib/pnm/libpnm.a
-
+INC = $(addprefix -I, $(shell find $(SRC_DIR) $(LIB_DIR) -type d))
 
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
-OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-LIBS = $(shell find $(LIB_DIR) -type f -name "*.a")
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+LIBS = $(LIB_DIR)/pnm/libpnm.a
 
+# Tests
+TEST = pnm_tests
+TST_DIR = test
+TST_INC = $(addprefix -I, $(shell find $(TST_DIR) -type d))
+TSTS = $(shell find $(TST_DIR) -type f -name "*.c")
+TST_OBJS = $(TSTS:$(TST_DIR)/%.c=$(TST_DIR)/$(OBJ_DIR)/%.o)
+TST_CFLAGS = --std=c99 $(INC) $(TST_INC)
+
+CC = gcc
+CFLAGS = --std=c99 --pedantic -Wall -W -Wextra -Wmissing-prototypes $(INC)
+LD = gcc
+LDFLAGS = -lm
 
 all: $(TARGET)
 
-
-$(TARGET): $(OBJS)
-	$(СС) $(OBJS) -o $@ $(LDFLAGS)
-
+$(TARGET): $(OBJS) $(LIBS)
+	$(LD) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
+$(LIB_DIR)/%.a:
+	@make -C $(dir $@)
 
-clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+pnm_librairie: $(LIBS)
 
+$(TEST): $(TST_OBJS) $(LIBS) $(OBJ_DIR)/filter.o
+	$(LD) $^ -o $@ $(LDFLAGS)
 
-
-
-pnm_tests:
-	echo $(LIBS)
-
-pnm_librairie:
-	make -C lib/pnm
-
+$(TST_DIR)/$(OBJ_DIR)/%.o: $(TST_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) -c $< -o $@ $(TST_CFLAGS)
 
 doc:
+	@doxygen Doxyfile
 
+clean:
+	@rm -rf $(OBJ_DIR) $(TARGET) $(TST_DIR)/$(OBJ_DIR) $(TEST)
 
 git:
-	git pull
-	git add .
-	git commit -m Update
-	git push
+	@git pull
+	@git add .
+	@git commit -m Update
+	@git push
+
+tar:
+	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) $(LIB_DIR) $(TST_DIR) test_image Makefile Doxyfile

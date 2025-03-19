@@ -28,7 +28,7 @@
  *
  * @return
  *     0: Success
- *    -1: Image is NULL
+ *    -3: Image is NULL
  */
 int turnaround(PNM *image);
 
@@ -42,9 +42,9 @@ int turnaround(PNM *image);
  *
  * @return
  *     0: Success
- *    -1: Image is NULL
- *    -2: Image is not in PPM format
- *    -3: Invalid parameter
+ *    -1: Image is not in PPM format
+ *    -2: Invalid parameter
+ *    -3: Image is NULL
  */
 int monochrome(PNM *image, const char *parameter);
 
@@ -60,8 +60,8 @@ int monochrome(PNM *image, const char *parameter);
  *
  * @return
  *     0: Success
- *    -1: Image is NULL
- *    -2: Image is not in PPM format
+ *    -1: Image is not in PPM format
+ *    -3: Image is NULL
  */
 int negative(PNM *image);
 
@@ -79,9 +79,9 @@ int negative(PNM *image);
  *
  * @return
  *     0: Success
- *    -1: Memory allocation failure
- *    -2: Image is not in PPM format
- *    -3: Invalid parameter
+ *    -1: Image is not in PPM format
+ *    -2: Invalid parameter
+ *    -3: Image is NULL
  */
 int fifty_shades_of_grey(PNM *image, const char *parameter);
 
@@ -99,9 +99,9 @@ int fifty_shades_of_grey(PNM *image, const char *parameter);
  *
  * @return
  *     0: Success
- *    -1: Invalid parameter
- *    -2: Image is not in PPM format
- *    -3: Invalid parameter
+ *    -1: Image is not in PPM format
+ *    -2: Invalid parameter
+ *    -3: Image is NULL
  */
 int black_and_white(PNM *image, const char *parameter);
 

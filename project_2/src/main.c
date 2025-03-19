@@ -1,21 +1,28 @@
 /**
  * @file main.c
- * @brief
+ * @brief A program to manipulate PNM format files by applying various filters.
+ *
+ * Supported formats:
+ * - PBM (Portable Bitmap)
+ * - PGM (Portable Graymap)
+ * - PPM (Portable Pixmap)
  *
  * @author Pavlov Aleksandr (s2400691)
  * @date 24.03.2025
-*/
+ * @version 1.0.0
+ */
 
 #include <getopt.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include "pnm.h"
 #include "filter.h"
 
 
-#define VERSION "0.1.0"
+#define VERSION "1.0.0"
 #define AUTHORS "Pavlov Aleksandr (s2400691)"
 
 
@@ -41,17 +48,25 @@ const char *program_name;
 /**
  * @brief Displays help about using the command and exits the program.
  *
- * @param status
+ * This function prints the usage instructions for the program, including
+ * details about the available options and filters.
+ *
+ * @param status Exit status to terminate the program with.
  */
 static void usage(int status);
 
 /* ======= Functions ======= */
 
 /**
- * @brief
+ * @brief Entry point of the program.
  *
- * @param argc
- * @param argv
+ * Parses command-line arguments, loads the input PNM file, applies the
+ * specified filter, and writes the result to the output file.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Array of command-line arguments.
+ *
+ * @return int Exit status of the program.
  */
 int main(int argc, char **argv) {
    program_name = argv[0];
@@ -95,9 +110,6 @@ int main(int argc, char **argv) {
    } else if (output_filename == NULL) {
       fprintf(stderr, "%s: missing '-o' argument\n", program_name);
       usage(EXIT_FAILURE);
-   } else if (filter_string == NULL) {
-      fprintf(stderr, "%s: missing '-f' argument\n", program_name);
-      usage(EXIT_FAILURE);
    }
 
    PNM *image = NULL;
@@ -125,7 +137,9 @@ int main(int argc, char **argv) {
    }
 
    int result_code;
-   if (!strcasecmp(filter_string, "retournement")) {
+   if (filter_string == NULL) {
+      result_code = FILTER_SUCCESS;
+   } else if (!strcasecmp(filter_string, "retournement")) {
       result_code = turnaround(image);
    } else if (!strcasecmp(filter_string, "monochrome")) {
       result_code = monochrome(image, parameter_string);
@@ -150,6 +164,7 @@ int main(int argc, char **argv) {
             program_name);
          free_pnm(&image);
          usage(EXIT_FAILURE);
+         break;
       case FILTER_INVALID_PARAMETER:
          if (parameter_string == NULL) {
             fprintf(stderr, "%s: missing '-p' argument\n", program_name);
@@ -159,6 +174,7 @@ int main(int argc, char **argv) {
          }
          free_pnm(&image);
          usage(EXIT_FAILURE);
+         break;
       default:
          fprintf(stderr, "%s: error: ", program_name);
          perror("");
@@ -198,7 +214,7 @@ static void usage(int status) {
       fprintf(stderr, "Try '%s --help' for more information.\n",
          program_name);
    } else {
-      printf("Usage: %s -i SOURCE -f FILTER [-p PARAM] -o DEST\n",
+      printf("Usage: %s -i SOURCE [-f FILTER] [-p PARAM] -o DEST\n",
          program_name);
       fputs("\
 Manipulates PNM format files.\n\
@@ -207,12 +223,12 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -i, --input=FILE             specify input file (.ppm, .pbm, .pgm)\n\
   -o, --output=FILE            specify output file (.ppm, .pbm, .pgm)\n\
   -f, --filter=FILTER          specify filter to apply:\n\
-                                 retournement       (no parameter required)\n\
-                                 monochrome         (requires PARAM: 'r', 'v', or 'b')\n\
-                                 negatif            (no parameter required)\n\
-                                 gris               (requires PARAM: '1' or '2')\n\
-                                 NB                 (requires PARAM: threshold value 0-255)\n\
-  -p, --parameter=PARAM        specify additional parameter for the filter (if required)\n\
+                                 retournement  (NO PARAM)\n\
+                                 monochrome    (PARAM: r, v, b)\n\
+                                 negatif       (NO PARAM)\n\
+                                 gris          (PARAM: 1, 2)\n\
+                                 NB            (PARAM: 0 - 255)\n\
+  -p, --parameter=PARAM        specify parameter for the filter (if required)\n\
       --help                   display this help and exit\n\
       --version                output version information and exit\n\
 ", stdout);

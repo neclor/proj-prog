@@ -76,9 +76,9 @@ int main(int argc, char **argv) {
    const char *filter_string = NULL;
    const char *parameter_string = NULL;
 
-   int c;
-   while ((c = getopt_long(argc, argv, "i:o:f:p:", longopts, NULL)) != -1) {
-      switch (c) {
+   int optc;
+   while ((optc = getopt_long(argc, argv, "i:o:f:p:", longopts, NULL)) != -1) {
+      switch (optc) {
          case 'i':
             input_filename = optarg;
             break;
@@ -228,7 +228,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
                                  negatif       (NO PARAM)\n\
                                  gris          (PARAM: 1, 2)\n\
                                  NB            (PARAM: 0 - 255)\n\
-  -p, --parameter=PARAM        specify parameter for the filter\n\
+  -p, --parameter=PARAM        specify parameter for the filter (if required)\n\
       --help                   display this help and exit\n\
       --version                output version information and exit\n\
 ", stdout);

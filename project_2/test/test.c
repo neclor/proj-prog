@@ -4,9 +4,16 @@
 
 /* ======= Constants ======= */
 
-const char *image_pbm_path = "test_image/image.pbm";
-const char *image_pgm_path = "test_image/image.pgm";
-const char *image_ppm_path = "test_image/image.ppm";
+const char *invalid_filename = "__abc__";
+
+const char *image_pbm_path = "test_image/valid_image.pbm";
+const char *image_pgm_path = "test_image/valid_image.pgm";
+const char *image_ppm_path = "test_image/valid_image.ppm";
+
+const char *invalid_format_ppm_path = "test_image/invalid_format.ppm";
+const char *invalid_size_ppm_path = "test_image/invalid_size.ppm";
+const char *invalid_max_value_ppm_path = "test_image/invalid_max_value.ppm";
+const char *invalid_data_ppm_path = "test_image/invalid_data.ppm";
 
 const char *result_pbm_path = "test_image/result.pbm";
 const char *result_pgm_path = "test_image/result.pgm";
@@ -20,7 +27,7 @@ static void test_load_pnm() {
    assert_true(load_pnm(NULL, image_pbm_path) < 0);
    assert_true(load_pnm(&image, NULL) < 0);
 
-   assert_int_equal(load_pnm(&image, "\0"), PNM_INVALID_FILENAME);
+   assert_int_equal(load_pnm(&image, invalid_filename), PNM_INVALID_FILENAME);
 
    assert_int_equal(load_pnm(&image, image_pbm_path), PNM_SUCCESS);
    assert_int_equal(get_format(image), FORMAT_PBM);
@@ -32,7 +39,7 @@ static void test_load_pnm() {
    }
    free_pnm(&image);
 
-   assert_int_equal(PNM_SUCCESS, load_pnm(&image, image_pgm_path));
+   assert_int_equal(load_pnm(&image, image_pgm_path), PNM_SUCCESS);
    assert_int_equal(get_format(image), FORMAT_PGM);
    assert_int_equal(get_width(image), 3);
    assert_int_equal(get_height(image), 3);
@@ -42,7 +49,7 @@ static void test_load_pnm() {
    }
    free_pnm(&image);
 
-   assert_int_equal(PNM_SUCCESS, load_pnm(&image, image_ppm_path));
+   assert_int_equal(load_pnm(&image, image_ppm_path), PNM_SUCCESS);
    assert_int_equal(get_format(image), FORMAT_PPM);
    assert_int_equal(get_width(image), 3);
    assert_int_equal(get_height(image), 3);
@@ -51,6 +58,11 @@ static void test_load_pnm() {
       assert_int_equal(get_data(image)[i], PPM_MAX_VALUE);
    }
    free_pnm(&image);
+
+   assert_int_equal(load_pnm(&image, invalid_format_ppm_path), LOAD_PNM_DECODE_ERROR);
+   assert_int_equal(load_pnm(&image, invalid_size_ppm_path), LOAD_PNM_DECODE_ERROR);
+   assert_int_equal(load_pnm(&image, invalid_max_value_ppm_path), LOAD_PNM_DECODE_ERROR);
+   assert_int_equal(load_pnm(&image, invalid_data_ppm_path), LOAD_PNM_DECODE_ERROR);
 }
 
 static void test_write_pnm() {
@@ -65,7 +77,7 @@ static void test_write_pnm() {
    assert_true(write_pnm(image_pbm, NULL) < 0);
 
    assert_int_equal(write_pnm(image_pbm, "<>abc.pbm"), PNM_INVALID_FILENAME);
-   assert_int_equal(write_pnm(image_pbm, "abc"), PNM_INVALID_FILENAME);
+   assert_int_equal(write_pnm(image_pbm, invalid_filename), PNM_INVALID_FILENAME);
 
    assert_int_equal(write_pnm(image_pbm, result_pbm_path), PNM_SUCCESS);
    PNM *result_pbm = NULL;

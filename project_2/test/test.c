@@ -117,6 +117,10 @@ static void test_write_pnm() {
    }
    free_pnm(&image_ppm);
    free_pnm(&result_ppm);
+
+   remove(result_pbm_path);
+   remove(result_pgm_path);
+   remove(result_ppm_path);
 }
 
 static void test_turnaround() {

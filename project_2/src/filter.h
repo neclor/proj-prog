@@ -38,7 +38,8 @@ int turnaround(PNM *image);
  * @param image Pointer to the PNM image structure.
  * @param parameter A string indicating the color channel ("r", "v", "b").
  *
- * @pre image != NULL, parameter != NULL
+ * @pre image != NULL, parameter != NULL, image format is PPM
+ * @post image format is PGM
  *
  * @return
  *     0: Success
@@ -56,7 +57,8 @@ int monochrome(PNM *image, const char *parameter);
  *
  * @param image Pointer to the PNM image structure.
  *
- * @pre image != NULL
+ * @pre image != NULL, image format is PPM
+ * @post image format is PPM
  *
  * @return
  *     0: Success
@@ -75,7 +77,8 @@ int negative(PNM *image);
  * @param image Pointer to the PNM image structure.
  * @param parameter A string indicating the method ("1" or "2").
  *
- * @pre image != NULL, parameter != NULL
+ * @pre image != NULL, parameter != NULL, image format is PPM
+ * @post image format is PGM
  *
  * @return
  *     0: Success
@@ -95,7 +98,8 @@ int fifty_shades_of_grey(PNM *image, const char *parameter);
  * @param image Pointer to the PNM image structure.
  * @param parameter A string representing the threshold value (0 to 255).
  *
- * @pre image != NULL, parameter != NULL
+ * @pre image != NULL, parameter != NULL, image format is PPM or PGM
+ * @post image format is PBM
  *
  * @return
  *     0: Success

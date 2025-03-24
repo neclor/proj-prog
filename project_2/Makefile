@@ -44,11 +44,23 @@ $(TST_DIR)/$(OBJ_DIR)/%.o: $(TST_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c $< -o $@ $(TST_CFLAGS)
 
+pnm_clean:
+	@make -C $(LIB_DIR)/pnm clean
+
 doc:
 	@doxygen Doxyfile
 
 clean:
 	@rm -rf $(OBJ_DIR) $(TARGET) $(TST_DIR)/$(OBJ_DIR) $(TEST)
+
+my_test:
+	./$(TARGET) -i test_image/valid_image.ppm -o a.ppm
+	./$(TARGET) -i test_image/valid_image.ppm -f retournement -o a.ppm
+	./$(TARGET) -i test_image/valid_image.ppm -f monochrome -p r -o a.ppm
+	./$(TARGET) -i test_image/valid_image.ppm -f negatif -o a.ppm
+	./$(TARGET) -i test_image/valid_image.ppm -f gris -p 1 -o a.pgm
+	./$(TARGET) -i test_image/valid_image.ppm -f NB -p 128 -o a.pbm
+	rm a.pbm a.pgm a.ppm
 
 git:
 	@git pull
@@ -58,3 +70,5 @@ git:
 
 tar:
 	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) $(LIB_DIR) $(TST_DIR) test_image Makefile Doxyfile
+
+.PHONY: all $(TARGET) $(TEST) pnm_librairie pnm_clean doc clean my_test git tar

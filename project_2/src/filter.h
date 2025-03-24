@@ -58,7 +58,6 @@ int monochrome(PNM *image, const char *parameter);
  * @param image Pointer to the PNM image structure.
  *
  * @pre image != NULL, image format is PPM
- * @post image format is PPM
  *
  * @return
  *     0: Success

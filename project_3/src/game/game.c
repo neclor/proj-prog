@@ -18,6 +18,7 @@ void (*on_game_begun)() = NULL;
 void (*on_chest_opened)(int chest_index, bool treasured) = NULL;
 void (*on_game_over)(bool win) = NULL;
 
+
 /* ======= Constants ======= */
 
 typedef enum States_t {
@@ -34,7 +35,6 @@ static unsigned int wins = 0;
 static unsigned int losses = 0;
 
 static int treasure_chest_index = 0;
-static int selected_chest_index;
 static int opened_chest_index;
 
 /* ======= Internal Function Prototypes ======= */
@@ -54,7 +54,7 @@ void start_game() {
 }
 
 void select_chest(unsigned int i) {
-   if (i < 0 || 2 < i) return;
+   if (i < 0 || CHESTS_NUMBER <= i) return;
 
    switch (state) {
       case FIRST_CHOICE:
@@ -81,11 +81,10 @@ unsigned int get_losses() {
 /* ======= Internal Functions ======= */
 
 static void first_select_chest(unsigned int chest_index) {
-   selected_chest_index = chest_index;
-   open_empty_chest();
+   open_empty_chest(chest_index);
 }
 
-static void open_empty_chest() {
+static void open_empty_chest(unsigned int selected_chest_index) {
    do {
       opened_chest_index = rand() % CHESTS_NUMBER;
    } while (

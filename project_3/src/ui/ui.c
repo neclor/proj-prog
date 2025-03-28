@@ -44,6 +44,7 @@ static void on_chest_button_clicked(GtkWidget *button, gpointer data);
 static GtkWidget *init_window();
 static void init_menu(GtkWidget *window);
 static int button_set_image(GtkWidget *button, const char *image_path);
+static void on_window_close(GtkWidget *widget, gpointer data);
 
 /* ======= External Functions ======= */
 
@@ -117,7 +118,7 @@ static GtkWidget *init_window() {
    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(window), "Monty Hall Problem");
    gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
-   g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+   g_signal_connect(window, "destroy", G_CALLBACK(on_window_close), NULL);
    return window;
 }
 
@@ -168,16 +169,26 @@ static int button_set_image(GtkWidget *button, const char *image_path) {
       pixbuf, IMAGE_WIDTH, IMAGE_HEIGHT, GDK_INTERP_NEAREST
    );
    if (scaled_pixbuf == NULL) {
+      g_object_unref(pixbuf);
       fprintf(stderr, "Failed to create image: '%s'\n", image_path);
       return -1;
    }
 
    GtkWidget *image = gtk_image_new_from_pixbuf(scaled_pixbuf);
    if (image == NULL) {
+      g_object_unref(pixbuf);
+      g_object_unref(scaled_pixbuf);
       fprintf(stderr, "Failed to create image: '%s'\n", image_path);
       return -1;
    }
 
    gtk_button_set_image(GTK_BUTTON(button), image);
+   g_object_unref(pixbuf);
+   g_object_unref(scaled_pixbuf);
    return 0;
+}
+
+static void on_window_close(GtkWidget *widget, gpointer data) {
+   gtk_widget_destroy(widget);
+   gtk_main_quit();
 }

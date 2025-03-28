@@ -9,7 +9,7 @@ SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 CC = gcc
-CFLAGS = --std=c99 --pedantic -Wall -W -Wextra -Wmissing-prototypes `pkg-config --cflags gtk+-2.0` $(INC)
+CFLAGS = -g --std=c99 --pedantic -Wall -W -Wextra -Wmissing-prototypes `pkg-config --cflags gtk+-2.0` $(INC)
 LD = gcc
 LDFLAGS = `pkg-config --libs gtk+-2.0`
 
@@ -35,4 +35,4 @@ git:
 	@git push
 
 tar:
-	@tar -czvf filtres.tar.gz $(SRC_DIR) $(LIB_DIR) $(TST_DIR) test_image Makefile Doxyfile
+	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) Makefile Doxyfile

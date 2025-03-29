@@ -1,8 +1,8 @@
 /**
- * @file
- * @brief
+ * @file ui.c
+ * @brief Implementation of the user interface.
  *
- * @date 27.03.2025
+ * @date 29.03.2025
  * @author Aleksandr Pavlov (s2400691)
 */
 
@@ -34,32 +34,128 @@ static GtkWidget *chest_buttons[CHESTS_NUMBER];
 
 /* ======= Internal Function Prototypes ======= */
 
-static void update_wins_label();
-static void update_losses_label();
+/**
+ * @brief Updates the UI when the game begins.
+ *
+ * @post Update status label, reset chest buttons.
+ */
+static void game_begun(void);
+
+/**
+ * @brief Updates the UI when a chest is opened.
+ *
+ * @param chest_index Index of the chest that was opened.
+ * @param treasured if treasure chest, true, else false.
+ *
+ * @pre 0 < chest_index < CHESTS_NUMBER.
+ * @post Update chest button.
+ */
+static void chest_opened(int chest_index, bool treasured);
+
+/**
+ * @brief Updates the UI when the game ends.
+ *
+ * @param win if the player wins, true, else false.
+ *
+ * @post Update status label, disable all chest buttons.
+ */
+static void game_over(bool win);
+
+/**
+ * @brief Update wins label.
+ */
+static void update_wins_label(void);
+
+/**
+ * @brief Update losses label.
+ */
+static void update_losses_label(void);
+
+/**
+ * @brief Update status label with text.
+ *
+ * @param text The text to display in the status label.
+ */
 static void status_label_set_text(const char *text);
 
-static void on_restart_button_clicked(GtkWidget *button, gpointer data);
-static void on_chest_button_clicked(GtkWidget *button, gpointer data);
+/**
+ * @brief Callback invoked when the restart button is clicked.
+ *
+ * @param button UNUSED
+ * @param data UNUSED
+ *
+ * @post Restart game.
+ */
+static void on_restart_button_clicked(
+   GtkWidget *button G_GNUC_UNUSED, gpointer data G_GNUC_UNUSED
+);
 
-static GtkWidget *init_window();
+/**
+ * @brief Callback invoked when a chest button is clicked.
+ *
+ * @param button UNUSED
+ * @param data UNUSED
+ */
+static void on_chest_button_clicked(
+   GtkWidget *button G_GNUC_UNUSED, gpointer data G_GNUC_UNUSED
+);
+
+/**
+ * @brief Initializes the main game window.
+ *
+ * @return Pointer to GTK window
+ */
+static GtkWidget *init_window(void);
+
+/**
+ * @brief Initializes the menu.
+ *
+ * @param window Pointer to GTK window
+ */
 static void init_menu(GtkWidget *window);
+
+/**
+ * @brief Sets an image on a button.
+ *
+ * @param button Pointer to GTK button
+ * @param image_path The file path to the image
+ *
+ * @pre button is a valid GTK button, image_path is a valid image file.
+ *
+ * @return
+ *     0 Success
+ *    -1 Image could not be loaded or set
+ */
 static int button_set_image(GtkWidget *button, const char *image_path);
-static void on_window_close(GtkWidget *widget, gpointer data);
+
+/**
+ * @brief Handles the window close event.
+ *
+ * @param window Pointer to GTK window
+ * @param data UNUSED
+ *
+ * @post Ends the program, destroys window.
+ */
+static void on_window_close(
+   GtkWidget *window, gpointer data G_GNUC_UNUSED
+);
 
 /* ======= External Functions ======= */
 
-void init_ui() {
+void init_ui(void) {
    GtkWidget *window = init_window();
    init_menu(window);
 
-   on_game_begun = ui_game_begun;
-   on_chest_opened = ui_chest_opened;
-   on_game_over = ui_game_over;
+   on_game_begun = game_begun;
+   on_chest_opened = chest_opened;
+   on_game_over = game_over;
 
    gtk_widget_show_all(window);
 }
 
-void ui_game_begun() {
+/* ======= Internal functions ======= */
+
+static void game_begun() {
    status_label_set_text("Select chest");
 
    for (unsigned int i = 0; i < CHESTS_NUMBER; i++) {
@@ -68,15 +164,16 @@ void ui_game_begun() {
    }
 }
 
-void ui_chest_opened(int chest_index, bool treasured) {
+static void chest_opened(int chest_index, bool treasured) {
    status_label_set_text("Select chest");
 
    const char *image = treasured ? TREASURE_CHEST : EMPTY_CHEST;
    button_set_image(chest_buttons[chest_index], image);
+
    gtk_widget_set_sensitive(chest_buttons[chest_index], FALSE);
 }
 
-void ui_game_over(bool win) {
+static void game_over(bool win) {
    update_wins_label();
    update_losses_label();
 
@@ -87,15 +184,13 @@ void ui_game_over(bool win) {
    }
 }
 
-/* ======= Internal functions ======= */
-
-static void update_wins_label() {
+static void update_wins_label(void) {
    char text[100];
    sprintf(text, "Wins: %u", get_wins());
    gtk_label_set_text(GTK_LABEL(wins_label), text);
 }
 
-static void update_losses_label() {
+static void update_losses_label(void) {
    char text[100];
    sprintf(text, "Losses: %u", get_losses());
    gtk_label_set_text(GTK_LABEL(losses_label), text);
@@ -105,18 +200,24 @@ static void status_label_set_text(const char *text) {
    gtk_label_set_text(GTK_LABEL(status_label), text);
 }
 
-static void on_restart_button_clicked(GtkWidget *button, gpointer data) {
+static void on_restart_button_clicked(
+   GtkWidget *button G_GNUC_UNUSED, gpointer data G_GNUC_UNUSED
+) {
    start_game();
 }
 
-static void on_chest_button_clicked(GtkWidget *button, gpointer data) {
+static void on_chest_button_clicked(
+   GtkWidget *button G_GNUC_UNUSED, gpointer data G_GNUC_UNUSED
+) {
    unsigned int chest_index = GPOINTER_TO_UINT(data);
    select_chest(chest_index);
 }
 
-static GtkWidget *init_window() {
+static GtkWidget *init_window(void) {
    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-   gtk_window_set_title(GTK_WINDOW(window), "Monty Hall Problem");
+   gtk_window_set_title(
+      GTK_WINDOW(window), "Treasure Hunt or Monty Hall Problem"
+   );
    gtk_window_set_default_size(GTK_WINDOW(window), WINDOW_WIDTH, WINDOW_HEIGHT);
    g_signal_connect(window, "destroy", G_CALLBACK(on_window_close), NULL);
    return window;
@@ -188,7 +289,9 @@ static int button_set_image(GtkWidget *button, const char *image_path) {
    return 0;
 }
 
-static void on_window_close(GtkWidget *widget, gpointer data) {
-   gtk_widget_destroy(widget);
+static void on_window_close(
+   GtkWidget *window, gpointer data G_GNUC_UNUSED
+) {
+   gtk_widget_destroy(window);
    gtk_main_quit();
 }

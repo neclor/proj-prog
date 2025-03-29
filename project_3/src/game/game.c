@@ -1,8 +1,8 @@
 /**
- * @file
- * @brief
+ * @file game.c
+ * @brief Implementation of game logic.
  *
- * @date 27.03.2025
+ * @date 29.03.2025
  * @author Aleksandr Pavlov (s2400691)
 */
 
@@ -17,7 +17,6 @@
 void (*on_game_begun)() = NULL;
 void (*on_chest_opened)(int chest_index, bool treasured) = NULL;
 void (*on_game_over)(bool win) = NULL;
-
 
 /* ======= Constants ======= */
 
@@ -34,18 +33,44 @@ static States state = FIRST_CHOICE;
 static unsigned int wins = 0;
 static unsigned int losses = 0;
 
-static int treasure_chest_index = 0;
-static int opened_chest_index;
+static unsigned int treasure_chest_index = 0;
+static unsigned int opened_chest_index;
 
 /* ======= Internal Function Prototypes ======= */
 
-static void first_select_chest(unsigned int i);
-static void open_empty_chest();
-static void second_select_chest(unsigned int i);
+/**
+ * @brief Handles the first chest selection by the player.
+ *
+ * @param chest_index Index of the chest selected by the player.
+ *
+ * @pre state = FIRST_CHOICE
+ * @post state = SECOND_CHOICE
+ */
+static void first_select_chest(unsigned int chest_index);
+
+/**
+ * @brief Opens an empty chest.
+ *
+ * @param selected_chest_index Index of the chest selected by the player.
+ *
+ * @pre 0 < selected_chest_index < CHESTS_NUMBER
+ * @post opened_chest_index = index of an empty chest
+ */
+static void open_empty_chest(unsigned int selected_chest_index);
+
+/**
+ * @brief Handles the second chest selection by the player.
+ *
+ * @param chest_index Index of the chest selected by the player.
+ *
+ * @pre state = SECOND_CHOICE, 0 < chest_index < CHESTS_NUMBER
+ * @post state = END
+ */
+static void second_select_chest(unsigned int chest_index);
 
 /* ======= External Functions ======= */
 
-void start_game() {
+void start_game(void) {
    srand(time(NULL));
    state = FIRST_CHOICE;
    treasure_chest_index = rand() % CHESTS_NUMBER;
@@ -54,7 +79,7 @@ void start_game() {
 }
 
 void select_chest(unsigned int i) {
-   if (i < 0 || CHESTS_NUMBER <= i) return;
+   if (CHESTS_NUMBER <= i) return;
 
    switch (state) {
       case FIRST_CHOICE:
@@ -70,45 +95,45 @@ void select_chest(unsigned int i) {
    }
 }
 
-unsigned int get_wins() {
+unsigned int get_wins(void) {
    return wins;
 }
 
-unsigned int get_losses() {
+unsigned int get_losses(void) {
    return losses;
 }
 
 /* ======= Internal Functions ======= */
 
 static void first_select_chest(unsigned int chest_index) {
-   open_empty_chest(chest_index);
+    open_empty_chest(chest_index);
 }
 
 static void open_empty_chest(unsigned int selected_chest_index) {
-   do {
-      opened_chest_index = rand() % CHESTS_NUMBER;
-   } while (
-      opened_chest_index == selected_chest_index ||
-      opened_chest_index == treasure_chest_index
-   );
+    do {
+        opened_chest_index = rand() % CHESTS_NUMBER;
+    } while (
+        opened_chest_index == selected_chest_index ||
+        opened_chest_index == treasure_chest_index
+    );
 
-   state = SECOND_CHOICE;
+    state = SECOND_CHOICE;
 
-   if (on_chest_opened != NULL) on_chest_opened(opened_chest_index, false);
+    if (on_chest_opened != NULL) on_chest_opened(opened_chest_index, false);
 }
 
-static void second_select_chest(unsigned int i) {
-   if (i == opened_chest_index) return;
+static void second_select_chest(unsigned int chest_index) {
+    if (chest_index == opened_chest_index) return;
 
-   bool win = (i == treasure_chest_index) ? true : false;
-   if (win) {
-      wins++;
-   } else {
-      losses++;
-   }
+    bool win = (chest_index == treasure_chest_index) ? true : false;
+    if (win) {
+        wins++;
+    } else {
+        losses++;
+    }
 
-   state = END;
+    state = END;
 
-   if (on_chest_opened != NULL) on_chest_opened(i, win);
-   if (on_game_over != NULL) on_game_over(win);
+    if (on_chest_opened != NULL) on_chest_opened(chest_index, win);
+    if (on_game_over != NULL) on_game_over(win);
 }

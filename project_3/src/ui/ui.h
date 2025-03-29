@@ -1,8 +1,8 @@
 /**
- * @file
- * @brief File contains functions for game logic
+ * @file ui.h
+ * @brief Header file containing function prototypes for the user interface.
  *
- * @date 27.03.2025
+ * @date 29.03.2025
  * @author Aleksandr Pavlov (s2400691)
 */
 
@@ -11,33 +11,11 @@
 
 /* ======= Function Prototypes ======= */
 
-
-
-
-
-
-
-void init_ui();
-
-
-
-
-
-
-void ui_game_begun();
-
-
-
-
-
-
-void ui_chest_opened(int chest_index, bool treasured);
-
-
-
-
-
-
-void ui_game_over(bool win);
+/**
+ * @brief Initializes the user interface.
+ *
+ * @pre GTK must be initialized before calling this function.
+ */
+void init_ui(void);
 
 #endif // _UI_H

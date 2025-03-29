@@ -121,12 +121,8 @@ static void init_menu(GtkWidget *window);
  * @param image_path The file path to the image
  *
  * @pre button is a valid GTK button, image_path is a valid image file.
- *
- * @return
- *     0 Success
- *    -1 Image could not be loaded or set
  */
-static int button_set_image(GtkWidget *button, const char *image_path);
+static void button_set_image(GtkWidget *button, const char *image_path);
 
 /**
  * @brief Handles the window close event.
@@ -259,34 +255,28 @@ static void init_menu(GtkWidget *window) {
    }
 }
 
-static int button_set_image(GtkWidget *button, const char *image_path) {
+static void button_set_image(GtkWidget *button, const char *image_path) {
    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(image_path, NULL);
    if (pixbuf == NULL) {
       fprintf(stderr, "Failed to load image: '%s'\n", image_path);
-      return -1;
    }
 
    GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(
       pixbuf, IMAGE_WIDTH, IMAGE_HEIGHT, GDK_INTERP_NEAREST
    );
    if (scaled_pixbuf == NULL) {
-      g_object_unref(pixbuf);
       fprintf(stderr, "Failed to create image: '%s'\n", image_path);
-      return -1;
    }
 
    GtkWidget *image = gtk_image_new_from_pixbuf(scaled_pixbuf);
    if (image == NULL) {
-      g_object_unref(pixbuf);
-      g_object_unref(scaled_pixbuf);
       fprintf(stderr, "Failed to create image: '%s'\n", image_path);
-      return -1;
    }
 
-   gtk_button_set_image(GTK_BUTTON(button), image);
    g_object_unref(pixbuf);
    g_object_unref(scaled_pixbuf);
-   return 0;
+
+   gtk_button_set_image(GTK_BUTTON(button), image);
 }
 
 static void on_window_close(

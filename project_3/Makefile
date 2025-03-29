@@ -35,4 +35,4 @@ git:
 	@git push
 
 tar:
-	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) Makefile Doxyfile
+	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) assets Makefile Doxyfile

@@ -1,11 +1,12 @@
 TARGET = tresor
 
-SRC_DIR	= src
+SRC_DIR	= .
 OBJ_DIR = build
 
 INC = $(addprefix -I, $(shell find $(SRC_DIR) -type d))
 
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
+HEDS = $(shell find $(SRC_DIR) -type f -name "*.h")
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 CC = gcc
@@ -35,4 +36,4 @@ git:
 	@git push
 
 tar:
-	@tar -czvf $(TARGET).tar.gz $(SRC_DIR) assets Makefile Doxyfile
+	@tar -czvf $(TARGET).tar.gz $(SRCS) $(HEDS) assets Makefile Doxyfile

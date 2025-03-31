@@ -37,3 +37,5 @@ git:
 
 tar:
 	@tar -czvf $(TARGET).tar.gz $(SRCS) $(HEDS) assets Makefile Doxyfile
+
+.PHONY: all $(TARGET) clean doc git tar
